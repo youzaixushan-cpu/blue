@@ -1,0 +1,57 @@
+@use "../../styles/mixins" as *;
+
+.player-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    @include bp(sm) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  &__search {
+    position: relative;
+    width: 100%;
+
+    @include bp(sm) {
+      max-width: 20rem;
+    }
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    color: var(--muted-foreground);
+    pointer-events: none;
+  }
+
+  &__search-input {
+    border-radius: 9999px;
+    padding-left: 2.5rem;
+  }
+
+  &__tabs {
+    border-radius: 9999px;
+  }
+
+  &__tab {
+    border-radius: 9999px;
+  }
+
+  &__count {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
+}

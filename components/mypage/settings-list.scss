@@ -1,0 +1,65 @@
+@use "../../styles/mixins" as *;
+
+.settings-list {
+  @include card-surface;
+
+  > * + * {
+    border-top: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+
+    @include bp(sm) {
+      padding: 1rem 1.5rem;
+    }
+  }
+
+  &__row-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    background-color: color-mix(in oklch, var(--primary) 10%, transparent);
+    color: var(--primary);
+
+    svg {
+      width: 1.125rem;
+      height: 1.125rem;
+    }
+  }
+
+  &__label {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &__description {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  &__action {
+    border-radius: 9999px;
+
+    &--danger {
+      color: var(--destructive);
+
+      &:hover {
+        color: var(--destructive);
+      }
+    }
+  }
+}

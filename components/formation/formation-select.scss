@@ -1,0 +1,10 @@
+@use "../../styles/mixins" as *;
+
+.formation-select {
+  width: 100%;
+  border-radius: 9999px;
+
+  @include bp(sm) {
+    width: 14rem;
+  }
+}

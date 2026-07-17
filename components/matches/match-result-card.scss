@@ -1,0 +1,131 @@
+@use "../../styles/mixins" as *;
+
+.match-result-card {
+  @include card-surface;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+
+  &__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  &__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  &__date {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  &__competition {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  &__result {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    &--win {
+      background-color: rgb(16 185 129 / 15%);
+      color: #34d399;
+    }
+    &--draw {
+      background-color: rgb(245 158 11 / 15%);
+      color: #fbbf24;
+    }
+    &--lose {
+      background-color: rgb(239 68 68 / 15%);
+      color: #f87171;
+    }
+  }
+
+  &__main {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  &__opponent {
+    font-weight: 700;
+  }
+
+  &__score {
+    font-size: 1.25rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__venue {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  &__venue-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  &__scorers {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    border-top: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    padding-top: 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  &__scorers-label {
+    font-weight: 600;
+    color: var(--muted-foreground);
+  }
+
+  &__scorer {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.1875rem;
+    border-radius: 9999px;
+    background-color: var(--muted);
+    padding: 0.125rem 0.5rem;
+    font-weight: 600;
+  }
+
+  &__scorer-minute {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+
+  &__lineup {
+    border-top: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    padding-top: 0.75rem;
+  }
+
+  &__lineup-title {
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+  }
+}

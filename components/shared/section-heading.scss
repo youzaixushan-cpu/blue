@@ -1,0 +1,46 @@
+@use "../../styles/mixins" as *;
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  &__eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+
+    @include bp(sm) {
+      font-size: 1.875rem;
+    }
+  }
+
+  &__description {
+    max-width: 42rem;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+
+    @include bp(sm) {
+      font-size: 1rem;
+    }
+  }
+
+  &__action {
+    flex-shrink: 0;
+  }
+}

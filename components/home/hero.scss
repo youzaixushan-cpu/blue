@@ -1,0 +1,144 @@
+@use "../../styles/mixins" as *;
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  // ブランド用の固定ダークネイビー。--primaryは暗い背景の上で使うアクセント色（明るい青）なので、
+  // ヒーローの大きな塗り面には使わず、常に読みやすい濃紺を明示的に指定する。
+  background: linear-gradient(135deg, #1e3a8a 0%, #0b1220 100%);
+  color: var(--foreground);
+
+  &__glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at top right,
+      rgb(96 165 250 / 30%),
+      transparent 60%
+    );
+  }
+
+  &__blob {
+    position: absolute;
+    top: -6rem;
+    left: -6rem;
+    width: 24rem;
+    height: 24rem;
+    border-radius: 9999px;
+    background-color: rgb(255 255 255 / 10%);
+    filter: blur(64px);
+  }
+
+  &__inner {
+    position: relative;
+    margin: 0 auto;
+    max-width: 80rem;
+    padding: 4rem 1.5rem;
+
+    @include bp(sm) {
+      padding: 5rem 1.5rem;
+    }
+    @include bp(lg) {
+      padding: 7rem 2rem;
+    }
+  }
+
+  &__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 40rem;
+  }
+
+  &__eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 70%);
+  }
+
+  &__title {
+    font-size: 2.25rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+
+    @include bp(sm) {
+      font-size: 3rem;
+    }
+    @include bp(lg) {
+      font-size: 3.75rem;
+    }
+  }
+
+  &__title-sub {
+    color: rgb(255 255 255 / 80%);
+  }
+
+  &__description {
+    max-width: 28rem;
+    font-size: 0.875rem;
+    color: rgb(255 255 255 / 70%);
+
+    @include bp(sm) {
+      font-size: 1rem;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  &__cta {
+    border-radius: 9999px;
+
+    &--primary {
+      background-color: #fff;
+      color: #0b1220;
+
+      &:hover {
+        background-color: rgb(255 255 255 / 90%);
+      }
+    }
+
+    &--secondary {
+      border-color: rgb(255 255 255 / 30%);
+      background-color: rgb(255 255 255 / 5%);
+      color: #fff;
+
+      &:hover {
+        background-color: rgb(255 255 255 / 15%);
+        color: #fff;
+      }
+    }
+  }
+
+  &__cta-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &__notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    max-width: 32rem;
+    border-radius: var(--radius-2xl);
+    border: 1px solid rgb(255 255 255 / 15%);
+    background-color: rgb(255 255 255 / 5%);
+    padding: 0.875rem 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: rgb(255 255 255 / 75%);
+  }
+
+  &__notice-icon {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.125rem;
+  }
+}

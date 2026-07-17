@@ -1,0 +1,40 @@
+@use "sass:map";
+
+// Tailwindのデフォルトブレークポイントと揃えている（sm/md/lg/xlの意味を統一するため）
+$breakpoints: (
+  sm: 640px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1280px,
+);
+
+// 使い方: @include bp(md) { ... }
+@mixin bp($name) {
+  @media (min-width: map.get($breakpoints, $name)) {
+    @content;
+  }
+}
+
+// カード状の面（枠線・背景・角丸）。多くのコンポーネントで共通利用。
+@mixin card-surface {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+}
+
+// キーボード操作時のフォーカスリング
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+// 横スクロール時にスクロールバーを隠す（モバイルの横スクロールカルーセル用）
+@mixin no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

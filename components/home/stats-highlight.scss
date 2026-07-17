@@ -1,0 +1,54 @@
+@use "../../styles/mixins" as *;
+
+.stats-highlight {
+  margin: 0 auto;
+  max-width: 80rem;
+  padding: 0 1.5rem 3.5rem;
+
+  @include bp(lg) {
+    padding: 0 2rem 3.5rem;
+  }
+
+  &__panel {
+    @include card-surface;
+    padding: 1.5rem;
+
+    @include bp(sm) {
+      padding: 2rem;
+    }
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  &__value {
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+
+    @include bp(sm) {
+      font-size: 1.875rem;
+    }
+  }
+
+  &__suffix {
+    margin-left: 0.125rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+
+  &__label {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+
+    @include bp(sm) {
+      font-size: 0.875rem;
+    }
+  }
+
+}

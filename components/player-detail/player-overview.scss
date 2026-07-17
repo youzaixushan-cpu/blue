@@ -1,0 +1,125 @@
+@use "../../styles/mixins" as *;
+
+.player-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__heading {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  &__bio {
+    line-height: 1.7;
+    color: var(--muted-foreground);
+  }
+
+  &__info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+
+    @include bp(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    border-radius: var(--radius-xl);
+    padding: 0.75rem 1rem;
+  }
+
+  &__info-label {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
+
+  &__info-value {
+    font-weight: 600;
+  }
+
+  &__ratings {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__rating-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__rating-match {
+    flex-shrink: 0;
+    width: 4rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  &__rating-track {
+    flex: 1 1 0%;
+    height: 0.625rem;
+    overflow: hidden;
+    border-radius: 9999px;
+    background-color: var(--muted);
+  }
+
+  &__rating-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background-color: var(--primary);
+  }
+
+  &__rating-value {
+    flex-shrink: 0;
+    width: 2rem;
+    text-align: right;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border-left: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    padding-left: 1.25rem;
+    list-style: none;
+  }
+
+  &__timeline-item {
+    position: relative;
+  }
+
+  &__timeline-dot {
+    position: absolute;
+    left: -1.5625rem;
+    top: 0.25rem;
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 9999px;
+    background-color: var(--primary);
+  }
+
+  &__timeline-year {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  &__timeline-club {
+    font-weight: 600;
+  }
+}

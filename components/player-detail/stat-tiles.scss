@@ -1,0 +1,36 @@
+@use "../../styles/mixins" as *;
+
+.stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+
+  @include bp(sm) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  &__tile {
+    @include card-surface;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  &__value {
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__suffix {
+    margin-left: 0.125rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+
+  &__label {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+}

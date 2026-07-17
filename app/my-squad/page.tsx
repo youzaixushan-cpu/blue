@@ -1,0 +1,168 @@
+"use client";
+
+import "./page.scss";
+import { useState } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import { toast } from "sonner";
+import { Share2, Download, RotateCcw } from "lucide-react";
+import { useSquad } from "@/lib/squad-context";
+import { getFormationById } from "@/lib/data/formations";
+import { SectionHeading } from "@/components/shared/section-heading";
+import { SquadSummaryBar } from "@/components/squad/squad-summary-bar";
+import { AddMemberForm } from "@/components/squad/add-member-form";
+import { FormationSelect } from "@/components/formation/formation-select";
+import { Pitch } from "@/components/formation/pitch";
+import { PlayerPool, POOL_ZONE_ID } from "@/components/formation/player-pool";
+import { PlayerAvatar } from "@/components/shared/player-avatar";
+import { Button } from "@/components/ui/button";
+import type { Position, RosterMember } from "@/lib/types";
+
+const POSITION_ORDER: Position[] = ["GK", "DF", "MF", "FW"];
+
+export default function MySquadPage() {
+  const {
+    members,
+    addMember,
+    removeMember,
+    formationId,
+    setFormationId,
+    assignments,
+    assignMember,
+    unassignSlot,
+    clearAssignments,
+    isHydrated,
+  } = useSquad();
+
+  const [activeMember, setActiveMember] = useState<RosterMember | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+  );
+
+  const formation = getFormationById(formationId);
+
+  const countsByPosition = POSITION_ORDER.reduce(
+    (acc, pos) => {
+      acc[pos] = members.filter((m) => m.position === pos).length;
+      return acc;
+    },
+    {} as Record<Position, number>,
+  );
+
+  const membersById = Object.fromEntries(members.map((m) => [m.id, m]));
+  const assignedIds = new Set(Object.values(assignments));
+  const unassignedMembers = members.filter((m) => !assignedIds.has(m.id));
+
+  function handleDragStart(event: DragStartEvent) {
+    const data = event.active.data.current as { memberId: string } | undefined;
+    if (!data) return;
+    setActiveMember(membersById[data.memberId] ?? null);
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    setActiveMember(null);
+    const { active, over } = event;
+    const data = active.data.current as { memberId: string; origin: string } | undefined;
+    if (!data) return;
+
+    if (!over) {
+      if (data.origin !== "pool") unassignSlot(data.origin);
+      return;
+    }
+    if (over.id === POOL_ZONE_ID) {
+      if (data.origin !== "pool") unassignSlot(data.origin);
+      return;
+    }
+    assignMember(String(over.id), data.memberId);
+  }
+
+  if (!isHydrated) {
+    return <div className="my-squad-page" />;
+  }
+
+  return (
+    <div className="my-squad-page">
+      <SectionHeading
+        eyebrow="Your Squad"
+        title="あなたの26人"
+        description="登録選手に関係なく、あなたの予想を自由に追加できます。名前を入力して追加し、フォーメーションの枠にドラッグして配置しましょう。"
+        className="my-squad-page__heading"
+      />
+
+      <SquadSummaryBar countsByPosition={countsByPosition} total={members.length} />
+
+      <div className="my-squad-page__add">
+        <AddMemberForm onAdd={addMember} />
+      </div>
+
+      {members.length === 0 ? (
+        <p className="my-squad-page__empty-hint">
+          まだ誰も追加されていません。上のフォームから最初のメンバーを追加してみましょう。
+        </p>
+      ) : (
+        <>
+          <div className="my-squad-page__toolbar">
+            <FormationSelect value={formationId} onChange={setFormationId} />
+            <div className="my-squad-page__toolbar-actions">
+              <Button variant="outline" className="my-squad-page__action" onClick={clearAssignments}>
+                <RotateCcw className="my-squad-page__action-icon" />
+                クリア
+              </Button>
+              <Button
+                variant="outline"
+                className="my-squad-page__action"
+                onClick={() => toast("画像エクスポートは近日公開予定です")}
+              >
+                <Download className="my-squad-page__action-icon" />
+                画像で保存
+              </Button>
+              <Button
+                className="my-squad-page__action"
+                onClick={() => toast("共有機能は近日公開予定です")}
+              >
+                <Share2 className="my-squad-page__action-icon" />
+                共有する
+              </Button>
+            </div>
+          </div>
+
+          <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+            <div className="my-squad-page__layout">
+              {formation && (
+                <Pitch
+                  formation={formation}
+                  assignments={assignments}
+                  members={membersById}
+                  onRemoveSlot={unassignSlot}
+                />
+              )}
+              <PlayerPool members={unassignedMembers} onRemove={removeMember} />
+            </div>
+
+            <DragOverlay>
+              {activeMember ? (
+                <div className="my-squad-page__drag-preview">
+                  <PlayerAvatar
+                    label={activeMember.nameEn}
+                    theme={activeMember.avatarTheme}
+                    size="md"
+                    className="my-squad-page__drag-avatar"
+                  />
+                  <span className="my-squad-page__drag-name">{activeMember.name}</span>
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        </>
+      )}
+    </div>
+  );
+}

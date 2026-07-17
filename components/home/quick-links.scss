@@ -1,0 +1,89 @@
+@use "../../styles/mixins" as *;
+
+.quick-links {
+  margin: 0 auto;
+  max-width: 80rem;
+  padding: 3.5rem 1.5rem;
+
+  @include bp(lg) {
+    padding: 3.5rem 2rem;
+  }
+
+  &__heading {
+    margin-bottom: 2rem;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+
+    @include bp(sm) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    @include bp(lg) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  &__card {
+    @include card-surface;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: color-mix(in oklch, var(--primary) 40%, transparent);
+      box-shadow: 0 12px 24px -12px rgb(0 0 0 / 18%);
+
+      .quick-links__card-arrow {
+        transform: translate(2px, -2px);
+      }
+    }
+  }
+
+  &__card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    background-color: color-mix(in oklch, var(--primary) 10%, transparent);
+    color: var(--primary);
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  &__card-arrow {
+    width: 1rem;
+    height: 1rem;
+    color: var(--muted-foreground);
+    transition: transform 0.15s ease;
+  }
+
+  &__card-title {
+    font-weight: 600;
+  }
+
+  &__card-desc {
+    margin-top: 0.125rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+}

@@ -1,0 +1,42 @@
+.confidence-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &__track {
+    flex: 1 1 0%;
+    height: 0.5rem;
+    overflow: hidden;
+    border-radius: 9999px;
+    background-color: var(--muted);
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.2s ease;
+
+    // 青の濃淡だけで信頼度の高低を表す統一感のあるスケール
+    &--high {
+      background-color: #1e3a8a;
+    }
+    &--good {
+      background-color: #2563eb;
+    }
+    &--fair {
+      background-color: #60a5fa;
+    }
+    &--low {
+      background-color: #cbd5e1;
+    }
+  }
+
+  &__value {
+    flex-shrink: 0;
+    width: 2.5rem;
+    text-align: right;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+}

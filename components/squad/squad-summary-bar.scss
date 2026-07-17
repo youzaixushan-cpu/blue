@@ -1,0 +1,67 @@
+@use "../../styles/mixins" as *;
+
+.squad-summary-bar {
+  @include card-surface;
+  padding: 1.5rem;
+
+  @include bp(sm) {
+    padding: 2rem;
+  }
+
+  &__top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  &__label {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
+
+  &__total {
+    font-size: 1.875rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__max {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+
+  &__breakdown {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+  }
+
+  &__breakdown-item {
+    text-align: center;
+  }
+
+  &__breakdown-count {
+    font-weight: 700;
+  }
+
+  &__breakdown-label {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  &__track {
+    margin-top: 1rem;
+    height: 0.625rem;
+    overflow: hidden;
+    border-radius: 9999px;
+    background-color: var(--muted);
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 9999px;
+    background-color: var(--primary);
+    transition: width 0.2s ease;
+  }
+}

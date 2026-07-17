@@ -1,0 +1,40 @@
+.player-avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-image: linear-gradient(
+    135deg,
+    var(--player-avatar-from),
+    var(--player-avatar-to)
+  );
+  color: rgb(255 255 255 / 85%);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 15%);
+  box-sizing: border-box;
+  border: 1px solid rgb(255 255 255 / 20%);
+  user-select: none;
+
+  &__icon {
+    width: 55%;
+    height: 55%;
+    stroke-width: 1.75;
+  }
+
+  &--sm {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+  &--md {
+    width: 3rem;
+    height: 3rem;
+  }
+  &--lg {
+    width: 5rem;
+    height: 5rem;
+  }
+  &--xl {
+    width: 7rem;
+    height: 7rem;
+  }
+}

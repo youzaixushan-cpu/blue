@@ -1,0 +1,28 @@
+.position-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+
+  // 青の濃淡だけでポジションを区別する統一感のある配色
+  &--gk {
+    background-color: rgb(2 132 199 / 20%);
+    color: #38bdf8;
+  }
+  &--df {
+    background-color: rgb(37 99 235 / 22%);
+    color: #60a5fa;
+  }
+  &--mf {
+    background-color: rgb(79 70 229 / 25%);
+    color: #818cf8;
+  }
+  &--fw {
+    background-color: rgb(148 163 184 / 20%);
+    color: #cbd5e1;
+  }
+}

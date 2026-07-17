@@ -1,0 +1,35 @@
+@use "../../styles/mixins" as *;
+
+.ai-team-page {
+  margin: 0 auto;
+  max-width: 72rem;
+  padding: 2.5rem 1.5rem;
+
+  @include bp(lg) {
+    padding: 2.5rem 2rem;
+  }
+
+  &__heading {
+    margin-bottom: 0.5rem;
+  }
+
+  &__updated {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  &__source {
+    margin-bottom: 2rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  &__layout {
+    display: grid;
+    gap: 1.5rem;
+
+    @include bp(lg) {
+      grid-template-columns: 1fr 1.1fr;
+    }
+  }
+}

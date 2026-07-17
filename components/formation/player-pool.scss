@@ -1,0 +1,54 @@
+@use "../../styles/mixins" as *;
+
+.player-pool {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  border-radius: var(--radius-3xl);
+  border: 1px solid var(--border);
+  background-color: color-mix(in oklch, var(--card) 50%, transparent);
+  padding: 1rem;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &--over {
+    border-color: color-mix(in oklch, var(--primary) 50%, transparent);
+    background-color: color-mix(in oklch, var(--primary) 5%, transparent);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.25rem;
+  }
+
+  &__title {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &__count {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    @include no-scrollbar;
+  }
+
+  &__empty {
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem 0.75rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+}

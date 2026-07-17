@@ -1,0 +1,84 @@
+@use "../../styles/mixins" as *;
+
+.trending-squads {
+  display: grid;
+  gap: 1rem;
+
+  @include bp(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &__card {
+    @include card-surface;
+    padding: 1.25rem;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  &__author {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  &__author-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &__date {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  &__formation {
+    border-radius: 9999px;
+  }
+
+  &__title {
+    margin-top: 0.75rem;
+    font-weight: 700;
+  }
+
+  &__avatars {
+    display: flex;
+    margin-top: 0.75rem;
+  }
+
+  &__avatar {
+    box-shadow: 0 0 0 2px var(--card);
+    margin-left: -0.5rem;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+
+  &__like {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: #ef4444;
+    }
+  }
+
+  &__like-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}

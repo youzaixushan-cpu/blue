@@ -1,0 +1,48 @@
+@use "../../styles/mixins" as *;
+
+.bottom-nav {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 50;
+  border-top: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+  background-color: color-mix(in oklch, var(--background) 90%, transparent);
+  backdrop-filter: blur(16px);
+  padding-bottom: env(safe-area-inset-bottom);
+
+  @include bp(md) {
+    display: none;
+  }
+
+  &__inner {
+    margin: 0 auto;
+    display: flex;
+    align-items: stretch;
+    max-width: 28rem;
+  }
+
+  &__link {
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    text-decoration: none;
+    background: none;
+    border: none;
+
+    &--active {
+      color: var(--primary);
+    }
+  }
+
+  &__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}

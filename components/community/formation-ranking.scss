@@ -1,0 +1,68 @@
+@use "../../styles/mixins" as *;
+
+.formation-ranking {
+  display: grid;
+  gap: 1rem;
+
+  @include bp(sm) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  &__card {
+    @include card-surface;
+    padding: 1.25rem;
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__medal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    font-weight: 700;
+
+    // 青の濃淡だけで順位を表す統一感のあるスケール
+    &--gold {
+      background-color: rgb(30 58 138 / 30%);
+      color: #93c5fd;
+    }
+    &--silver {
+      background-color: rgb(37 99 235 / 25%);
+      color: #60a5fa;
+    }
+    &--bronze {
+      background-color: rgb(2 132 199 / 20%);
+      color: #38bdf8;
+    }
+  }
+
+  &__medal-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  &__share {
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__name {
+    margin-top: 0.75rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+
+  &__description {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+}

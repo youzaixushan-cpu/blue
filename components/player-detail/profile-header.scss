@@ -1,0 +1,87 @@
+@use "../../styles/mixins" as *;
+
+.profile-header {
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklch, var(--accent) 40%, transparent),
+    transparent
+  );
+
+  &__inner {
+    margin: 0 auto;
+    max-width: 64rem;
+    padding: 2rem 1.5rem 2.5rem;
+
+    @include bp(lg) {
+      padding: 2rem 2rem 2.5rem;
+    }
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--foreground);
+    }
+  }
+
+  &__back-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    text-align: center;
+
+    @include bp(sm) {
+      flex-direction: row;
+      align-items: flex-end;
+      text-align: left;
+    }
+  }
+
+  &__main {
+    flex: 1 1 0%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    @include bp(sm) {
+      justify-content: flex-start;
+    }
+  }
+
+  &__name {
+    font-size: 1.875rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+
+    @include bp(sm) {
+      font-size: 2.25rem;
+    }
+  }
+
+  &__meta {
+    color: var(--muted-foreground);
+  }
+}
