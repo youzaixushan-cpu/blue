@@ -1,4 +1,5 @@
 import "./page.scss";
+import type { Metadata } from "next";
 import { getPlayerRankings, getFormationRankings, getCommunitySquads } from "@/lib/db/community";
 import { getAllPlayers } from "@/lib/db/players";
 import { SectionHeading } from "@/components/shared/section-heading";
@@ -8,6 +9,11 @@ import { TrendingSquads } from "@/components/community/trending-squads";
 
 // 投稿ごとにランキング・投稿一覧が変わるため、ビルド時に静的化せず常に最新のDB内容を表示する
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "みんなの代表",
+  description: "全国のファンが選んだ「あなたの26人」を集計。人気選手・人気フォーメーションが分かります。",
+};
 
 export default async function CommunityPage() {
   const [playerRankings, formationRankings, communitySquads, players] = await Promise.all([

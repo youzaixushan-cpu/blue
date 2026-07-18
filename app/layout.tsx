@@ -5,6 +5,7 @@ import "./layout.scss";
 import { SquadProvider } from "@/lib/squad-context";
 import { Header } from "@/components/layout/header";
 import { BottomNav } from "@/components/layout/bottom-nav";
+import { Footer } from "@/components/layout/footer";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { getAllPlayers } from "@/lib/db/players";
@@ -20,8 +21,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SAMURAI BLUE FAN HUB",
-  description: "日本代表ファンのための非公式ファンサイト（UI/UXモックアップ）",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  title: {
+    default: "SAMURAI BLUE FAN HUB",
+    template: "%s | SAMURAI BLUE FAN HUB",
+  },
+  description:
+    "日本代表ファンのための非公式ファンサイト。選手情報・試合結果・あなたの26人・AI代表予想・みんなの代表を発信しています。",
 };
 
 export default async function RootLayout({
@@ -37,7 +43,10 @@ export default async function RootLayout({
         <SquadProvider players={players}>
           <TooltipProvider delayDuration={150}>
             <Header />
-            <main className="app-shell__main">{children}</main>
+            <main className="app-shell__main">
+              {children}
+              <Footer />
+            </main>
             <BottomNav />
             <Toaster position="top-center" />
           </TooltipProvider>

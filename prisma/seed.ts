@@ -1,15 +1,16 @@
 import "dotenv/config";
 import { PrismaClient, Prisma } from "../lib/generated/prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { players } from "../lib/data/players";
 import { recentResults } from "../lib/data/matches";
 import { communitySquads } from "../lib/data/community";
 import { formationTemplates } from "../lib/data/formations";
 
-const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL! });
+const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  await prisma.communitySubmissionLike.deleteMany();
   await prisma.communitySubmissionMember.deleteMany();
   await prisma.communitySubmission.deleteMany();
   await prisma.playerRankStat.deleteMany();
@@ -66,6 +67,7 @@ async function main() {
         title: squad.title,
         likes: squad.likes,
         createdAt: new Date(squad.createdAt),
+        ipHash: "seed-data",
         members: {
           create: squad.topPlayers.map((playerId, index) => {
             const player = playersById.get(playerId);

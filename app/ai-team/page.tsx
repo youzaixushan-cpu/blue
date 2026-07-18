@@ -1,4 +1,5 @@
 import "./page.scss";
+import type { Metadata } from "next";
 import { getAllPlayers } from "@/lib/db/players";
 import { aiPrediction } from "@/lib/data/ai-team";
 import { SectionHeading } from "@/components/shared/section-heading";
@@ -7,6 +8,11 @@ import { PickList } from "@/components/ai-team/pick-list";
 
 // DB管理データのため、ビルド時に静的化せず常に最新の内容を表示する
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "AI代表",
+  description: "直近の代表戦データをもとにした、現時点で最も可能性の高いAI予想ベストイレブン。",
+};
 
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat("ja-JP", {

@@ -26,6 +26,10 @@ export function TrendingSquads({
   async function handleLike(id: string) {
     try {
       const res = await fetch(`/api/community/submissions/${id}/like`, { method: "POST" });
+      if (res.status === 409) {
+        toast("この投稿にはすでにいいね済みです");
+        return;
+      }
       if (!res.ok) throw new Error("failed");
       const data = (await res.json()) as { likes: number };
       setLikesOverride((prev) => ({ ...prev, [id]: data.likes }));

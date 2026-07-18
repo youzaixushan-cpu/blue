@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model Player {
@@ -50,7 +50,12 @@ model CommunitySubmission {
   title       String
   likes       Int                         @default(0)
   createdAt   DateTime                    @default(now())
+  // 投稿元のIPをハッシュ化した値（レート制限用。生IPは保存しない）
+  ipHash      String
   members     CommunitySubmissionMember[]
+  likedBy     CommunitySubmissionLike[]
+
+  @@index([ipHash, createdAt])
 }
 
 model CommunitySubmissionMember {
@@ -66,4 +71,15 @@ model CommunitySubmissionMember {
 model PlayerRankStat {
   playerId String @id
   lastRank Int
+}
+
+// 同一訪問者（IPハッシュ）による同一投稿への連打いいねを防止するための記録
+model CommunitySubmissionLike {
+  id           String              @id @default(cuid())
+  submissionId String
+  submission   CommunitySubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  ipHash       String
+  createdAt    DateTime            @default(now())
+
+  @@unique([submissionId, ipHash])
 }

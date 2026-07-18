@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { submitSquad, SubmitSquadValidationError, type SubmitSquadMemberInput } from "@/lib/db/community";
+import {
+  submitSquad,
+  SubmitSquadValidationError,
+  SubmitSquadRateLimitError,
+  type SubmitSquadMemberInput,
+} from "@/lib/db/community";
+import { getClientIp, hashIp } from "@/lib/rate-limit";
 
 interface SubmitSquadRequestBody {
   formationId?: unknown;
@@ -35,14 +41,19 @@ export async function POST(request: Request) {
   }
 
   try {
+    const ipHash = hashIp(getClientIp(request));
     const id = await submitSquad({
       formationId: body.formationId,
       authorName: typeof body.authorName === "string" ? body.authorName : undefined,
       title: typeof body.title === "string" ? body.title : undefined,
       members: body.members,
+      ipHash,
     });
     return NextResponse.json({ id }, { status: 201 });
   } catch (error) {
+    if (error instanceof SubmitSquadRateLimitError) {
+      return NextResponse.json({ error: error.message }, { status: 429 });
+    }
     if (error instanceof SubmitSquadValidationError) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }

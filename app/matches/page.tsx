@@ -1,4 +1,5 @@
 import "./page.scss";
+import type { Metadata } from "next";
 import { CalendarClock } from "lucide-react";
 import { upcomingNotice } from "@/lib/data/matches";
 import { getRecentResults } from "@/lib/db/matches";
@@ -8,6 +9,11 @@ import { MatchResultCard } from "@/components/matches/match-result-card";
 
 // DB管理データのため、ビルド時に静的化せず常に最新の内容を表示する
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "試合結果・スケジュール",
+  description: "2026年のSAMURAI BLUEの全試合結果と、今後の予定をまとめて確認できます。",
+};
 
 export default async function MatchesPage() {
   const [recentResults, players] = await Promise.all([getRecentResults(), getAllPlayers()]);

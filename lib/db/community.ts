@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/client";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { getFormationById } from "@/lib/data/formations";
 import type { CommunitySquad, FormationRanking, PlayerRanking, Position } from "@/lib/types";
 
@@ -14,9 +15,15 @@ export interface SubmitSquadInput {
   authorName?: string;
   title?: string;
   members: SubmitSquadMemberInput[];
+  ipHash: string;
 }
 
+const SUBMIT_RATE_LIMIT_MAX = 5;
+const SUBMIT_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
+
 export class SubmitSquadValidationError extends Error {}
+export class SubmitSquadRateLimitError extends Error {}
+export class AlreadyLikedError extends Error {}
 
 export async function submitSquad(input: SubmitSquadInput): Promise<string> {
   const formation = getFormationById(input.formationId);
@@ -30,6 +37,16 @@ export async function submitSquad(input: SubmitSquadInput): Promise<string> {
     throw new SubmitSquadValidationError("選手名が空のスロットがあります");
   }
 
+  const recentCount = await prisma.communitySubmission.count({
+    where: {
+      ipHash: input.ipHash,
+      createdAt: { gte: new Date(Date.now() - SUBMIT_RATE_LIMIT_WINDOW_MS) },
+    },
+  });
+  if (recentCount >= SUBMIT_RATE_LIMIT_MAX) {
+    throw new SubmitSquadRateLimitError("投稿回数の上限に達しました。しばらくしてからお試しください。");
+  }
+
   const authorName = (input.authorName?.trim() || "匿名サポーター").slice(0, 40);
   const title = (input.title?.trim() || `${formation.name}の予想布陣`).slice(0, 80);
 
@@ -38,6 +55,7 @@ export async function submitSquad(input: SubmitSquadInput): Promise<string> {
       formationId: input.formationId,
       authorName,
       title,
+      ipHash: input.ipHash,
       members: {
         create: input.members.map((m) => ({
           slotId: m.slotId,
@@ -52,7 +70,16 @@ export async function submitSquad(input: SubmitSquadInput): Promise<string> {
   return submission.id;
 }
 
-export async function likeSubmission(id: string): Promise<number> {
+export async function likeSubmission(id: string, ipHash: string): Promise<number> {
+  try {
+    await prisma.communitySubmissionLike.create({ data: { submissionId: id, ipHash } });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      throw new AlreadyLikedError("すでにいいね済みです");
+    }
+    throw error;
+  }
+
   const updated = await prisma.communitySubmission.update({
     where: { id },
     data: { likes: { increment: 1 } },
