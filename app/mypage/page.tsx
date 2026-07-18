@@ -24,7 +24,9 @@ export default function MyPage() {
       <div className="mypage-page">
         <SectionHeading eyebrow="My Page" title="マイページ" />
         <p className="mypage-page__signed-out">
-          マイページを見るにはログインしてください。
+          マイページを見るにはログインが必要です。ログインすると「あなたの26人」がどの端末からでも同じ内容で見られるようになります。
+          <br />
+          なお、ログインしなくても選手一覧・試合結果・AI代表・みんなの代表・あなたの26人（この端末内）は引き続きご利用いただけます。
         </p>
         <Button asChild>
           <Link href="/login">ログイン</Link>

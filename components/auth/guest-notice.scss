@@ -1,0 +1,29 @@
+.guest-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background-color: color-mix(in oklch, var(--accent) 40%, transparent);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+
+  &__text {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+  }
+
+  &__link {
+    flex-shrink: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

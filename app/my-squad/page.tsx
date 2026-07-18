@@ -17,6 +17,7 @@ import { Download, RotateCcw, X as XIcon } from "lucide-react";
 import { useSquad } from "@/lib/squad-context";
 import { getFormationById } from "@/lib/data/formations";
 import { SectionHeading } from "@/components/shared/section-heading";
+import { GuestNotice } from "@/components/auth/guest-notice";
 import { SquadSummaryBar } from "@/components/squad/squad-summary-bar";
 import { AddMemberForm } from "@/components/squad/add-member-form";
 import { SubmitSquadDialog } from "@/components/squad/submit-squad-dialog";
@@ -119,6 +120,8 @@ export default function MySquadPage() {
         description="登録選手に関係なく、あなたの予想を自由に追加できます。名前を入力して追加し、フォーメーションの枠にドラッグして配置しましょう。"
         className="my-squad-page__heading"
       />
+
+      <GuestNotice />
 
       <SquadSummaryBar countsByPosition={countsByPosition} total={members.length} />
 
