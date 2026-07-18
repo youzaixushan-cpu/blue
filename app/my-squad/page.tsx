@@ -1,7 +1,7 @@
 "use client";
 
 import "./page.scss";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -12,7 +12,8 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { toast } from "sonner";
-import { Download, RotateCcw } from "lucide-react";
+import { toPng } from "html-to-image";
+import { Download, RotateCcw, X as XIcon } from "lucide-react";
 import { useSquad } from "@/lib/squad-context";
 import { getFormationById } from "@/lib/data/formations";
 import { SectionHeading } from "@/components/shared/section-heading";
@@ -43,12 +44,33 @@ export default function MySquadPage() {
   } = useSquad();
 
   const [activeMember, setActiveMember] = useState<RosterMember | null>(null);
+  const pitchRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
   );
 
   const formation = getFormationById(formationId);
+
+  async function handleExportImage() {
+    if (!pitchRef.current) return;
+    try {
+      const dataUrl = await toPng(pitchRef.current, { pixelRatio: 2 });
+      const link = document.createElement("a");
+      link.download = `samurai-blue-squad-${formationId}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch {
+      toast.error("画像の書き出しに失敗しました");
+    }
+  }
+
+  function handleShareX() {
+    const text = `${formation ? formation.name + "で" : ""}「あなたの26人」を作りました！ #SAMURAIBLUE`;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(siteUrl)}`;
+    window.open(intent, "_blank", "noopener,noreferrer");
+  }
 
   const countsByPosition = POSITION_ORDER.reduce(
     (acc, pos) => {
@@ -117,13 +139,13 @@ export default function MySquadPage() {
                 <RotateCcw className="my-squad-page__action-icon" />
                 クリア
               </Button>
-              <Button
-                variant="outline"
-                className="my-squad-page__action"
-                onClick={() => toast("画像エクスポートは近日公開予定です")}
-              >
+              <Button variant="outline" className="my-squad-page__action" onClick={handleExportImage}>
                 <Download className="my-squad-page__action-icon" />
                 画像で保存
+              </Button>
+              <Button variant="outline" className="my-squad-page__action" onClick={handleShareX}>
+                <XIcon className="my-squad-page__action-icon" />
+                Xでシェア
               </Button>
               <SubmitSquadDialog />
             </div>
@@ -133,6 +155,7 @@ export default function MySquadPage() {
             <div className="my-squad-page__layout">
               {formation && (
                 <Pitch
+                  ref={pitchRef}
                   formation={formation}
                   assignments={assignments}
                   members={membersById}

@@ -8,14 +8,16 @@ export function Pitch({
   assignments,
   members,
   onRemoveSlot,
+  ref,
 }: {
   formation: FormationTemplate;
   assignments: Record<string, string>;
   members: Record<string, RosterMember>;
   onRemoveSlot: (slotId: string) => void;
+  ref?: React.Ref<HTMLDivElement>;
 }) {
   return (
-    <div className="pitch">
+    <div className="pitch" ref={ref}>
       <PitchLines />
       {formation.slots.map((slot) => (
         <PositionSlot
