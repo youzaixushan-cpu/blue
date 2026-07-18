@@ -55,6 +55,16 @@ export function PlayerOverview({ player }: { player: Player }) {
           ))}
         </ol>
       </section>
+
+      {player.lastSyncedAt && (
+        <p className="player-overview__sync-note">
+          年齢・所属クラブはWikidataと自動同期しています（最終更新:{" "}
+          {new Intl.DateTimeFormat("ja-JP", { dateStyle: "medium" }).format(
+            new Date(player.lastSyncedAt),
+          )}
+          ）
+        </p>
+      )}
     </div>
   );
 }

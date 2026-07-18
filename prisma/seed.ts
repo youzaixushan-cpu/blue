@@ -5,6 +5,7 @@ import { players } from "../lib/data/players";
 import { recentResults } from "../lib/data/matches";
 import { communitySquads } from "../lib/data/community";
 import { formationTemplates } from "../lib/data/formations";
+import { wikidataIds } from "../lib/data/wikidata-ids";
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
@@ -34,6 +35,7 @@ async function main() {
       career: p.career as unknown as Prisma.InputJsonValue,
       avatarTheme: p.avatarTheme,
       officialSquad: p.officialSquad,
+      wikidataId: wikidataIds[p.id] ?? null,
     })),
   });
   console.log(`Seeded ${players.length} players`);

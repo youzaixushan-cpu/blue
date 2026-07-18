@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/client";
+import { calculateAge } from "@/lib/date";
 import type { Player, Position } from "@/lib/types";
 import type { AvatarThemeKey } from "@/lib/avatar";
 import type { PlayerModel } from "@/lib/generated/prisma/models";
@@ -10,7 +11,8 @@ function toPlayer(row: PlayerModel): Player {
     nameEn: row.nameEn,
     position: row.position as Position,
     club: row.club,
-    age: row.age,
+    // Wikidataから生年月日が同期できていればそこから計算し、無ければ手入力値のまま
+    age: row.birthDate ? calculateAge(row.birthDate) : row.age,
     height: row.height,
     weight: row.weight,
     caps: row.caps,
@@ -20,6 +22,8 @@ function toPlayer(row: PlayerModel): Player {
     career: row.career as unknown as { year: string; club: string }[],
     avatarTheme: row.avatarTheme as AvatarThemeKey,
     officialSquad: row.officialSquad,
+    birthDate: row.birthDate?.toISOString(),
+    lastSyncedAt: row.lastSyncedAt?.toISOString(),
   };
 }
 

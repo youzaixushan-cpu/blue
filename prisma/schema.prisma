@@ -28,6 +28,14 @@ model Player {
   career        Json
   avatarTheme   String
   officialSquad Boolean
+
+  // Wikidataとの連携用（すべて任意 — 未マッチの選手はnullのまま、手入力のage/clubがフォールバックされる）
+  birthDate      DateTime?
+  wikidataId     String?
+  // 直近の同期で確認できた所属クラブのQID。これが変わった時だけ実際の「移籍」とみなしclubを更新する
+  // （Wikidata側のクラブ名表記ゆれだけで毎回clubの文言が変わってしまうのを防ぐため）
+  currentClubQid String?
+  lastSyncedAt DateTime?
 }
 
 model Match {

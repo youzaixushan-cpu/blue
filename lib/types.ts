@@ -19,6 +19,9 @@ export interface Player {
   avatarTheme: AvatarThemeKey;
   // 直近の実際の招集メンバー（26名）かどうか。false は登録されていない予想用の候補選手。
   officialSquad: boolean;
+  // Wikidataと同期できた場合のみ設定される（未設定の場合はageが手入力の固定値のまま）
+  birthDate?: string;
+  lastSyncedAt?: string;
 }
 
 // 「あなたの26人」に入る1エントリー。登録選手を参照する場合と、
