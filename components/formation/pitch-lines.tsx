@@ -1,3 +1,5 @@
+import "./pitch-lines.scss";
+
 export function PitchLines() {
   return (
     <svg
