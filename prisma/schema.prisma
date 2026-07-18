@@ -91,3 +91,62 @@ model CommunitySubmissionLike {
 
   @@unique([submissionId, ipHash])
 }
+
+// ここから Auth.js（NextAuth v5）標準のスキーマ。認証はGoogle OAuth + メール/パスワードの併用。
+// Credentialsプロバイダーを使うためセッション戦略はjwt（databaseセッションは使わないが、
+// アダプターの型要件・将来のOAuthセッション管理のためSessionモデル自体は用意しておく）。
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  // メール/パスワードログイン用のハッシュ（bcryptjs）。OAuthのみで登録したユーザーはnull。
+  password      String?
+  createdAt     DateTime  @default(now())
+
+  accounts Account[]
+  sessions Session[]
+  squad    UserSquad?
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// 「あなたの26人」のアカウント連携保存。ログイン中はここに同期し、どの端末からでも同じ内容を見られるようにする。
+// stateには従来lib/squad-context.tsxがlocalStorageに保存していたのと同じ形（members/formationId/assignmentsByFormation）をそのまま入れる。
+model UserSquad {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  state     Json
+  updatedAt DateTime @updatedAt
+}

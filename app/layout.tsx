@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./layout.scss";
+import { SessionProvider } from "next-auth/react";
 import { SquadProvider } from "@/lib/squad-context";
 import { Header } from "@/components/layout/header";
 import { BottomNav } from "@/components/layout/bottom-nav";
@@ -9,6 +10,7 @@ import { Footer } from "@/components/layout/footer";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { getAllPlayers } from "@/lib/db/players";
+import { auth } from "@/lib/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,22 +37,24 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const players = await getAllPlayers();
+  const [players, session] = await Promise.all([getAllPlayers(), auth()]);
 
   return (
     <html lang="ja" className={`${geistSans.variable} ${geistMono.variable} app-shell`}>
       <body className="app-shell__body">
-        <SquadProvider players={players}>
-          <TooltipProvider delayDuration={150}>
-            <Header />
-            <main className="app-shell__main">
-              {children}
-              <Footer />
-            </main>
-            <BottomNav />
-            <Toaster position="top-center" />
-          </TooltipProvider>
-        </SquadProvider>
+        <SessionProvider session={session}>
+          <SquadProvider players={players}>
+            <TooltipProvider delayDuration={150}>
+              <Header />
+              <main className="app-shell__main">
+                {children}
+                <Footer />
+              </main>
+              <BottomNav />
+              <Toaster position="top-center" />
+            </TooltipProvider>
+          </SquadProvider>
+        </SessionProvider>
       </body>
     </html>
   );

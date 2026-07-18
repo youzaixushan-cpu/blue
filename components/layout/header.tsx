@@ -3,13 +3,14 @@
 import "./header.scss";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { allNavItems } from "@/lib/nav";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
-import { dummyUser } from "@/lib/data/user";
 
 export function Header() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <header className="header">
@@ -35,9 +36,19 @@ export function Header() {
         </nav>
 
         <div className="header__actions">
-          <Link href="/mypage" aria-label="マイページ">
-            <PlayerAvatar label={dummyUser.name} seed={dummyUser.avatarSeed} size="sm" />
-          </Link>
+          {session?.user ? (
+            <Link href="/mypage" aria-label="マイページ">
+              <PlayerAvatar
+                label={session.user.name ?? session.user.email ?? "User"}
+                seed={session.user.email ?? session.user.name ?? undefined}
+                size="sm"
+              />
+            </Link>
+          ) : (
+            <Link href="/login" className="header__login-link">
+              ログイン
+            </Link>
+          )}
         </div>
       </div>
     </header>

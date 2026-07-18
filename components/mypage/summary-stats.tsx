@@ -2,18 +2,17 @@ import "./summary-stats.scss";
 
 export function SummaryStats({
   squadCount,
-  favoriteFormation,
-  favoritePlayerName,
+  assignedCount,
+  formationName,
 }: {
   squadCount: number;
-  favoriteFormation: string;
-  favoritePlayerName: string;
+  assignedCount: number;
+  formationName: string;
 }) {
   const stats = [
     { label: "選出済み選手", value: `${squadCount}人` },
-    { label: "好きなフォーメーション", value: favoriteFormation },
-    { label: "推し選手", value: favoritePlayerName },
-    { label: "閲覧した選手ページ", value: "48回" },
+    { label: "フォーメーション配置済み", value: `${assignedCount}人` },
+    { label: "現在のフォーメーション", value: formationName },
   ];
 
   return (

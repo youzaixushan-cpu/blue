@@ -5,10 +5,12 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 import type { Player, Position, RosterMember } from "@/lib/types";
 
 const STORAGE_KEY = "samurai-squad-v4";
@@ -52,6 +54,9 @@ export function SquadProvider({
 }) {
   const [state, setState] = useState<SquadState>(DEFAULT_STATE);
   const [isHydrated, setIsHydrated] = useState(false);
+  const { status } = useSession();
+  const hasReconciledRef = useRef(false);
+  const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     try {
@@ -73,6 +78,61 @@ export function SquadProvider({
     if (!isHydrated) return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state, isHydrated]);
+
+  // ログイン時: サーバー側に保存済みのデータがあればそれを採用し、
+  // 何も保存されていない（初回ログイン）場合はローカルの内容を一度だけサーバーへ移行する。
+  // 未ログイン時は今まで通りlocalStorageのみで動作し、一切サーバーへ通信しない。
+  useEffect(() => {
+    if (status !== "authenticated" || hasReconciledRef.current) return;
+    hasReconciledRef.current = true;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/squad");
+        if (!res.ok) return;
+        const data = (await res.json()) as { state: SquadState | null };
+        if (data.state) {
+          setState({ ...DEFAULT_STATE, ...data.state });
+          return;
+        }
+
+        let localState: SquadState | null = null;
+        try {
+          const raw = window.localStorage.getItem(STORAGE_KEY);
+          if (raw) localState = JSON.parse(raw) as SquadState;
+        } catch {
+          // 破損データは無視
+        }
+        if (localState && localState.members.length > 0) {
+          await fetch("/api/squad", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ state: localState }),
+          });
+        }
+      } catch {
+        // ネットワークエラー時はローカルの状態のまま継続する
+      }
+    })();
+  }, [status]);
+
+  // ログイン中の変更をサーバーへデバウンスして同期する
+  useEffect(() => {
+    if (!isHydrated || status !== "authenticated") return;
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    syncTimeoutRef.current = setTimeout(() => {
+      fetch("/api/squad", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ state }),
+      }).catch(() => {
+        // 同期失敗時もローカルには保存済みなので致命的ではない
+      });
+    }, 800);
+    return () => {
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    };
+  }, [state, isHydrated, status]);
 
   const value = useMemo<SquadContextValue>(() => {
     const addMember = (rawName: string, position: Position) => {

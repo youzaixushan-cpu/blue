@@ -112,13 +112,3 @@ export interface FormationRanking {
   share: number;
   rank: number;
 }
-
-export interface DummyUser {
-  name: string;
-  handle: string;
-  avatarSeed: string;
-  memberSince: string;
-  fanLevel: string;
-  favoriteFormation: string;
-  favoritePlayerId: string;
-}

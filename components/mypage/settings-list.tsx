@@ -3,6 +3,7 @@
 import "./settings-list.scss";
 import { useState } from "react";
 import { toast } from "sonner";
+import { signOut } from "next-auth/react";
 import { Bell, LogOut, ShieldCheck } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ export function SettingsList() {
   const [notifications, setNotifications] = useState(true);
 
   function handleSignOut() {
-    toast("ログアウトしました（デモ表示のため実際には何も起こりません）");
+    signOut({ callbackUrl: "/" });
   }
 
   return (
