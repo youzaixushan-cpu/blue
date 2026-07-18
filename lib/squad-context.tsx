@@ -39,7 +39,7 @@ interface SquadContextValue {
   assignments: Record<string, string>;
   assignMember: (slotId: string, memberId: string) => void;
   unassignSlot: (slotId: string) => void;
-  clearAssignments: () => void;
+  clearSquad: () => void;
   isHydrated: boolean;
 }
 
@@ -232,14 +232,14 @@ export function SquadProvider({
       });
     };
 
-    const clearAssignments = () => {
+    // ピッチの配置だけでなく、ベンチも含めた「あなたの26人」全員を削除する
+    const clearSquad = () => {
       setState((prev) => ({
         ...prev,
-        assignmentsByFormation: {
-          ...prev.assignmentsByFormation,
-          [prev.formationId]: {},
-        },
+        members: [],
+        assignmentsByFormation: {},
       }));
+      toast.success("あなたの26人をすべてクリアしました");
     };
 
     return {
@@ -252,7 +252,7 @@ export function SquadProvider({
       assignments: state.assignmentsByFormation[state.formationId] ?? {},
       assignMember,
       unassignSlot,
-      clearAssignments,
+      clearSquad,
       isHydrated,
     };
   }, [state, isHydrated, players]);

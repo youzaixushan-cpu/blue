@@ -40,7 +40,7 @@ export default function MySquadPage() {
     assignments,
     assignMember,
     unassignSlot,
-    clearAssignments,
+    clearSquad,
     isHydrated,
   } = useSquad();
 
@@ -63,6 +63,12 @@ export default function MySquadPage() {
       link.click();
     } catch {
       toast.error("画像の書き出しに失敗しました");
+    }
+  }
+
+  function handleClearSquad() {
+    if (window.confirm("ベンチのメンバーも含めて「あなたの26人」を全員削除します。よろしいですか？")) {
+      clearSquad();
     }
   }
 
@@ -138,9 +144,9 @@ export default function MySquadPage() {
           <div className="my-squad-page__toolbar">
             <FormationSelect value={formationId} onChange={setFormationId} />
             <div className="my-squad-page__toolbar-actions">
-              <Button variant="outline" className="my-squad-page__action" onClick={clearAssignments}>
+              <Button variant="outline" className="my-squad-page__action" onClick={handleClearSquad}>
                 <RotateCcw className="my-squad-page__action-icon" />
-                クリア
+                全てクリア
               </Button>
               <Button variant="outline" className="my-squad-page__action" onClick={handleExportImage}>
                 <Download className="my-squad-page__action-icon" />
