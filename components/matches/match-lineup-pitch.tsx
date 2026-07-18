@@ -1,15 +1,20 @@
 import "./match-lineup-pitch.scss";
 import { PitchLines } from "@/components/formation/pitch-lines";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
-import { getPlayerById } from "@/lib/data/players";
-import type { MatchLineupEntry } from "@/lib/types";
+import type { MatchLineupEntry, Player } from "@/lib/types";
 
-export function MatchLineupPitch({ lineup }: { lineup: MatchLineupEntry[] }) {
+export function MatchLineupPitch({
+  lineup,
+  players,
+}: {
+  lineup: MatchLineupEntry[];
+  players: Record<string, Player>;
+}) {
   return (
     <div className="match-lineup-pitch">
       <PitchLines />
       {lineup.map((entry) => {
-        const player = getPlayerById(entry.playerId);
+        const player = players[entry.playerId];
         if (!player) return null;
         return (
           <div

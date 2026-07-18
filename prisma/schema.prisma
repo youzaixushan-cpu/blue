@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Player {
+  id            String  @id
+  name          String
+  nameEn        String
+  position      String
+  club          String
+  age           Int
+  height        Int
+  weight        Int
+  caps          Int
+  goals         Int
+  bio           String
+  recentRatings Json
+  career        Json
+  avatarTheme   String
+  officialSquad Boolean
+}
+
+model Match {
+  id           String @id
+  opponent     String
+  opponentFlag String
+  competition  String
+  venue        String
+  date         String
+  score        String
+  result       String
+  scorers      Json
+  lineup       Json
+}
+
+model CommunitySubmission {
+  id          String                      @id @default(cuid())
+  formationId String
+  authorName  String
+  title       String
+  likes       Int                         @default(0)
+  createdAt   DateTime                    @default(now())
+  members     CommunitySubmissionMember[]
+}
+
+model CommunitySubmissionMember {
+  id           String              @id @default(cuid())
+  submissionId String
+  submission   CommunitySubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  slotId       String
+  playerId     String?
+  name         String
+  position     String
+}
+
+model PlayerRankStat {
+  playerId String @id
+  lastRank Int
+}

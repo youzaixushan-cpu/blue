@@ -9,8 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { toast } from "sonner";
-import { players } from "@/lib/data/players";
-import type { Position, RosterMember } from "@/lib/types";
+import type { Player, Position, RosterMember } from "@/lib/types";
 
 const STORAGE_KEY = "samurai-squad-v4";
 const MAX_SQUAD_SIZE = 26;
@@ -29,6 +28,7 @@ const DEFAULT_STATE: SquadState = {
 };
 
 interface SquadContextValue {
+  players: Player[];
   members: RosterMember[];
   addMember: (name: string, position: Position) => void;
   removeMember: (memberId: string) => void;
@@ -43,7 +43,13 @@ interface SquadContextValue {
 
 const SquadContext = createContext<SquadContextValue | null>(null);
 
-export function SquadProvider({ children }: { children: ReactNode }) {
+export function SquadProvider({
+  children,
+  players,
+}: {
+  children: ReactNode;
+  players: Player[];
+}) {
   const [state, setState] = useState<SquadState>(DEFAULT_STATE);
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -177,6 +183,7 @@ export function SquadProvider({ children }: { children: ReactNode }) {
     };
 
     return {
+      players,
       members: state.members,
       addMember,
       removeMember,
@@ -188,7 +195,7 @@ export function SquadProvider({ children }: { children: ReactNode }) {
       clearAssignments,
       isHydrated,
     };
-  }, [state, isHydrated]);
+  }, [state, isHydrated, players]);
 
   return <SquadContext.Provider value={value}>{children}</SquadContext.Provider>;
 }

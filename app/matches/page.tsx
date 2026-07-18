@@ -1,10 +1,18 @@
 import "./page.scss";
 import { CalendarClock } from "lucide-react";
-import { recentResults, upcomingNotice } from "@/lib/data/matches";
+import { upcomingNotice } from "@/lib/data/matches";
+import { getRecentResults } from "@/lib/db/matches";
+import { getAllPlayers } from "@/lib/db/players";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MatchResultCard } from "@/components/matches/match-result-card";
 
-export default function MatchesPage() {
+// DB管理データのため、ビルド時に静的化せず常に最新の内容を表示する
+export const dynamic = "force-dynamic";
+
+export default async function MatchesPage() {
+  const [recentResults, players] = await Promise.all([getRecentResults(), getAllPlayers()]);
+  const playersById = Object.fromEntries(players.map((p) => [p.id, p]));
+
   return (
     <div className="matches-page">
       <SectionHeading
@@ -26,7 +34,7 @@ export default function MatchesPage() {
         <h2 className="matches-page__section-title">試合結果（{recentResults.length}試合）</h2>
         <div className="matches-page__list">
           {recentResults.map((match) => (
-            <MatchResultCard key={match.id} match={match} detailed />
+            <MatchResultCard key={match.id} match={match} players={playersById} detailed />
           ))}
         </div>
       </section>

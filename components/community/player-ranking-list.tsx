@@ -3,8 +3,7 @@ import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
 import { PositionBadge } from "@/components/players/position-badge";
-import { getPlayerById } from "@/lib/data/players";
-import type { PlayerRanking } from "@/lib/types";
+import type { Player, PlayerRanking } from "@/lib/types";
 
 const TREND_ICON = { up: ArrowUp, down: ArrowDown, same: Minus } as const;
 const TREND_MODIFIER = {
@@ -13,11 +12,17 @@ const TREND_MODIFIER = {
   same: "player-ranking-list__trend--same",
 } as const;
 
-export function PlayerRankingList({ rankings }: { rankings: PlayerRanking[] }) {
+export function PlayerRankingList({
+  rankings,
+  players,
+}: {
+  rankings: PlayerRanking[];
+  players: Record<string, Player>;
+}) {
   return (
     <div className="player-ranking-list">
       {rankings.map((ranking) => {
-        const player = getPlayerById(ranking.playerId);
+        const player = players[ranking.playerId];
         if (!player) return null;
         const TrendIcon = TREND_ICON[ranking.trend];
         return (

@@ -1,9 +1,8 @@
 import "./match-result-card.scss";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getPlayerById } from "@/lib/data/players";
 import { MatchLineupPitch } from "@/components/matches/match-lineup-pitch";
-import type { MatchResult } from "@/lib/types";
+import type { MatchResult, Player } from "@/lib/types";
 
 const RESULT_LABEL = { win: "勝", draw: "分", lose: "負" } as const;
 const RESULT_MODIFIER = {
@@ -22,9 +21,11 @@ function formatDate(iso: string) {
 
 export function MatchResultCard({
   match,
+  players,
   detailed = false,
 }: {
   match: MatchResult;
+  players: Record<string, Player>;
   detailed?: boolean;
 }) {
   const scorers = [...match.scorers].sort((a, b) => a.minute - b.minute);
@@ -59,7 +60,7 @@ export function MatchResultCard({
         <div className="match-result-card__scorers">
           <span className="match-result-card__scorers-label">得点者</span>
           {scorers.map((scorer, index) => {
-            const player = getPlayerById(scorer.playerId);
+            const player = players[scorer.playerId];
             return (
               <span key={index} className="match-result-card__scorer">
                 {player?.name ?? "不明"}
@@ -73,7 +74,7 @@ export function MatchResultCard({
       {detailed && match.lineup.length > 0 && (
         <div className="match-result-card__lineup">
           <p className="match-result-card__lineup-title">先発11人</p>
-          <MatchLineupPitch lineup={match.lineup} />
+          <MatchLineupPitch lineup={match.lineup} players={players} />
         </div>
       )}
     </div>

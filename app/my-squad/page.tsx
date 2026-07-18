@@ -12,12 +12,13 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { toast } from "sonner";
-import { Share2, Download, RotateCcw } from "lucide-react";
+import { Download, RotateCcw } from "lucide-react";
 import { useSquad } from "@/lib/squad-context";
 import { getFormationById } from "@/lib/data/formations";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { SquadSummaryBar } from "@/components/squad/squad-summary-bar";
 import { AddMemberForm } from "@/components/squad/add-member-form";
+import { SubmitSquadDialog } from "@/components/squad/submit-squad-dialog";
 import { FormationSelect } from "@/components/formation/formation-select";
 import { Pitch } from "@/components/formation/pitch";
 import { PlayerPool, POOL_ZONE_ID } from "@/components/formation/player-pool";
@@ -124,13 +125,7 @@ export default function MySquadPage() {
                 <Download className="my-squad-page__action-icon" />
                 画像で保存
               </Button>
-              <Button
-                className="my-squad-page__action"
-                onClick={() => toast("共有機能は近日公開予定です")}
-              >
-                <Share2 className="my-squad-page__action-icon" />
-                共有する
-              </Button>
+              <SubmitSquadDialog />
             </div>
           </div>
 

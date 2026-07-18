@@ -1,13 +1,14 @@
 import "./page.scss";
 import { notFound } from "next/navigation";
-import { players, getPlayerById } from "@/lib/data/players";
+import { getAllPlayers, getPlayerById } from "@/lib/db/players";
 import { ProfileHeader } from "@/components/player-detail/profile-header";
 import { StatTiles } from "@/components/player-detail/stat-tiles";
 import { PlayerOverview } from "@/components/player-detail/player-overview";
 
 export const dynamicParams = false;
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const players = await getAllPlayers();
   return players.filter((p) => p.officialSquad).map((p) => ({ id: p.id }));
 }
 
@@ -17,7 +18,7 @@ export default async function PlayerDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const player = getPlayerById(id);
+  const player = await getPlayerById(id);
   if (!player) notFound();
 
   return (

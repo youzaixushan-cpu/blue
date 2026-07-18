@@ -1,11 +1,12 @@
 import "./page.scss";
-import { players } from "@/lib/data/players";
+import { getAllPlayers } from "@/lib/db/players";
 import { aiPrediction } from "@/lib/data/ai-team";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { BestXiPitch } from "@/components/ai-team/best-xi-pitch";
 import { PickList } from "@/components/ai-team/pick-list";
 
-const playersById = Object.fromEntries(players.map((p) => [p.id, p]));
+// DB管理データのため、ビルド時に静的化せず常に最新の内容を表示する
+export const dynamic = "force-dynamic";
 
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat("ja-JP", {
@@ -16,7 +17,10 @@ function formatDate(iso: string) {
   }).format(new Date(iso));
 }
 
-export default function AiTeamPage() {
+export default async function AiTeamPage() {
+  const players = await getAllPlayers();
+  const playersById = Object.fromEntries(players.map((p) => [p.id, p]));
+
   return (
     <div className="ai-team-page">
       <SectionHeading

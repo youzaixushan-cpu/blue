@@ -3,7 +3,7 @@
 import "./add-member-form.scss";
 import { useMemo, useState } from "react";
 import { ChevronsUpDown, UserPlus } from "lucide-react";
-import { players } from "@/lib/data/players";
+import { useSquad } from "@/lib/squad-context";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Command,
@@ -33,21 +33,22 @@ const POSITION_GROUP_LABEL: Record<Position, string> = {
   FW: "フォワード",
 };
 
-// 候補として出すのは直近の招集メンバー（officialSquad）のみ
-const candidates = players.filter((p) => p.officialSquad);
-
 export function AddMemberForm({
   onAdd,
 }: {
   onAdd: (name: string, position: Position) => void;
 }) {
+  const { players } = useSquad();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [position, setPosition] = useState<Position>("MF");
 
+  // 候補として出すのは直近の招集メンバー（officialSquad）のみ
+  const candidates = useMemo(() => players.filter((p) => p.officialSquad), [players]);
+
   const matchedPlayer = useMemo(
     () => candidates.find((p) => p.name === name.trim()),
-    [name],
+    [candidates, name],
   );
 
   function selectPlayer(playerName: string) {

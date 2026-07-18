@@ -1,29 +1,13 @@
-"use client";
-
 import "./page.scss";
-import { useMemo, useState } from "react";
-import { players } from "@/lib/data/players";
-import { PlayerCard } from "@/components/players/player-card";
-import { PlayerFilterBar } from "@/components/players/player-filter-bar";
+import { getAllPlayers } from "@/lib/db/players";
+import { PlayersBrowser } from "@/components/players/players-browser";
 import { SectionHeading } from "@/components/shared/section-heading";
-import type { Position } from "@/lib/types";
 
-export default function PlayersPage() {
-  const [search, setSearch] = useState("");
-  const [position, setPosition] = useState<Position | "ALL">("ALL");
+// DB管理データのため、ビルド時に静的化せず常に最新の内容を表示する
+export const dynamic = "force-dynamic";
 
-  const filtered = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return players.filter((p) => p.officialSquad).filter((p) => {
-      const matchesPosition = position === "ALL" || p.position === position;
-      const matchesQuery =
-        query.length === 0 ||
-        p.name.toLowerCase().includes(query) ||
-        p.nameEn.toLowerCase().includes(query) ||
-        p.club.toLowerCase().includes(query);
-      return matchesPosition && matchesQuery;
-    });
-  }, [search, position]);
+export default async function PlayersPage() {
+  const players = await getAllPlayers();
 
   return (
     <div className="players-page">
@@ -34,26 +18,7 @@ export default function PlayersPage() {
         className="players-page__heading"
       />
 
-      <PlayerFilterBar
-        search={search}
-        onSearchChange={setSearch}
-        position={position}
-        onPositionChange={setPosition}
-        resultCount={filtered.length}
-      />
-
-      {filtered.length === 0 ? (
-        <div className="players-page__empty">
-          <p className="players-page__empty-title">該当する選手が見つかりません</p>
-          <p className="players-page__empty-hint">検索条件を変えてお試しください。</p>
-        </div>
-      ) : (
-        <div className="players-page__grid">
-          {filtered.map((player) => (
-            <PlayerCard key={player.id} player={player} />
-          ))}
-        </div>
-      )}
+      <PlayersBrowser players={players} />
     </div>
   );
 }

@@ -17,4 +17,9 @@
     font-size: 1.125rem;
     font-weight: 700;
   }
+
+  &__empty {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+  }
 }

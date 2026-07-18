@@ -1,11 +1,17 @@
 import "./recent-results.scss";
 import Link from "next/link";
-import { recentResults } from "@/lib/data/matches";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { MatchResultCard } from "@/components/matches/match-result-card";
 import { Button } from "@/components/ui/button";
+import type { MatchResult, Player } from "@/lib/types";
 
-export function RecentResults() {
+export function RecentResults({
+  recentResults,
+  players,
+}: {
+  recentResults: MatchResult[];
+  players: Record<string, Player>;
+}) {
   const latestFive = recentResults.slice(0, 5);
 
   return (
@@ -22,7 +28,7 @@ export function RecentResults() {
       />
       <div className="recent-results__grid">
         {latestFive.map((match) => (
-          <MatchResultCard key={match.id} match={match} />
+          <MatchResultCard key={match.id} match={match} players={players} />
         ))}
       </div>
     </section>
