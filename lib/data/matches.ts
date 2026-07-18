@@ -18,7 +18,7 @@ export const recentResults: MatchResult[] = [
     scorers: [{ playerId: "mf-02", minute: 29 }],
     // 3-4-2-1
     lineup: [
-      { playerId: "gk-03", x: 50, y: 83 },
+      { playerId: "gk-03", x: 50, y: 86 },
       { playerId: "df-05", x: 74, y: 70 },
       { playerId: "df-03", x: 50, y: 73 },
       { playerId: "df-06", x: 26, y: 70 },
@@ -43,7 +43,7 @@ export const recentResults: MatchResult[] = [
     scorers: [{ playerId: "fw-01", minute: 56 }],
     // 3-5-2
     lineup: [
-      { playerId: "gk-03", x: 50, y: 84 },
+      { playerId: "gk-03", x: 50, y: 86 },
       { playerId: "df-05", x: 70, y: 73 },
       { playerId: "df-03", x: 50, y: 76 },
       { playerId: "df-06", x: 30, y: 73 },
@@ -73,7 +73,7 @@ export const recentResults: MatchResult[] = [
     ],
     // 実際に報じられた先発11人・3-4-2-1（AI代表ページの予想と同じ布陣）
     lineup: [
-      { playerId: "gk-03", x: 50, y: 83 },
+      { playerId: "gk-03", x: 50, y: 86 },
       { playerId: "df-05", x: 74, y: 70 },
       { playerId: "df-03", x: 50, y: 73 },
       { playerId: "df-06", x: 26, y: 70 },
@@ -101,7 +101,7 @@ export const recentResults: MatchResult[] = [
     ],
     // 4-2-3-1
     lineup: [
-      { playerId: "gk-03", x: 50, y: 84 },
+      { playerId: "gk-03", x: 50, y: 86 },
       { playerId: "df-08", x: 80, y: 68 },
       { playerId: "df-03", x: 62, y: 73 },
       { playerId: "df-05", x: 38, y: 73 },
@@ -126,7 +126,7 @@ export const recentResults: MatchResult[] = [
     scorers: [{ playerId: "fw-03", minute: 71 }],
     // 4-4-2
     lineup: [
-      { playerId: "gk-02", x: 50, y: 84 },
+      { playerId: "gk-02", x: 50, y: 86 },
       { playerId: "df-09", x: 80, y: 68 },
       { playerId: "df-02", x: 62, y: 73 },
       { playerId: "df-07", x: 38, y: 73 },
@@ -151,7 +151,7 @@ export const recentResults: MatchResult[] = [
     scorers: [],
     // 4-4-2
     lineup: [
-      { playerId: "gk-01", x: 50, y: 84 },
+      { playerId: "gk-01", x: 50, y: 86 },
       { playerId: "df-08", x: 80, y: 68 },
       { playerId: "df-05", x: 62, y: 73 },
       { playerId: "df-02", x: 38, y: 73 },
@@ -176,7 +176,7 @@ export const recentResults: MatchResult[] = [
     scorers: [],
     // 4-4-2
     lineup: [
-      { playerId: "gk-01", x: 50, y: 84 },
+      { playerId: "gk-01", x: 50, y: 86 },
       { playerId: "df-04", x: 80, y: 68 },
       { playerId: "df-06", x: 62, y: 73 },
       { playerId: "df-02", x: 38, y: 73 },

@@ -9,7 +9,7 @@ export const formationTemplates: FormationTemplate[] = [
     name: "4-3-3",
     description: "両ウイングが幅を取り、中盤の3枚が主導権を握る攻撃的布陣",
     slots: [
-      { id: "f433-gk", label: "GK", x: 50, y: 84 },
+      { id: "f433-gk", label: "GK", x: 50, y: 86 },
       { id: "f433-rb", label: "RB", x: 80, y: 68 },
       { id: "f433-cb1", label: "CB", x: 62, y: 73 },
       { id: "f433-cb2", label: "CB", x: 38, y: 73 },
@@ -27,7 +27,7 @@ export const formationTemplates: FormationTemplate[] = [
     name: "4-4-2",
     description: "バランス重視のオーソドックスな2トップ布陣",
     slots: [
-      { id: "f442-gk", label: "GK", x: 50, y: 84 },
+      { id: "f442-gk", label: "GK", x: 50, y: 86 },
       { id: "f442-rb", label: "RB", x: 80, y: 68 },
       { id: "f442-cb1", label: "CB", x: 62, y: 73 },
       { id: "f442-cb2", label: "CB", x: 38, y: 73 },
@@ -45,7 +45,7 @@ export const formationTemplates: FormationTemplate[] = [
     name: "4-2-3-1",
     description: "2ボランチが土台を作り、3枚のシャドーが流動的に仕掛ける布陣",
     slots: [
-      { id: "f4231-gk", label: "GK", x: 50, y: 84 },
+      { id: "f4231-gk", label: "GK", x: 50, y: 86 },
       { id: "f4231-rb", label: "RB", x: 80, y: 68 },
       { id: "f4231-cb1", label: "CB", x: 62, y: 73 },
       { id: "f4231-cb2", label: "CB", x: 38, y: 73 },
@@ -63,7 +63,7 @@ export const formationTemplates: FormationTemplate[] = [
     name: "3-4-3",
     description: "3バックとウイングバックで幅を確保する超攻撃的布陣",
     slots: [
-      { id: "f343-gk", label: "GK", x: 50, y: 84 },
+      { id: "f343-gk", label: "GK", x: 50, y: 86 },
       { id: "f343-cb1", label: "CB", x: 70, y: 73 },
       { id: "f343-cb2", label: "CB", x: 50, y: 76 },
       { id: "f343-cb3", label: "CB", x: 30, y: 73 },
@@ -81,7 +81,7 @@ export const formationTemplates: FormationTemplate[] = [
     name: "3-5-2",
     description: "中盤5枚で数的優位を作り、2トップが最前線で仕留める布陣",
     slots: [
-      { id: "f352-gk", label: "GK", x: 50, y: 84 },
+      { id: "f352-gk", label: "GK", x: 50, y: 86 },
       { id: "f352-cb1", label: "CB", x: 70, y: 73 },
       { id: "f352-cb2", label: "CB", x: 50, y: 76 },
       { id: "f352-cb3", label: "CB", x: 30, y: 73 },

@@ -8,7 +8,7 @@ export const aiPrediction: AiPrediction = {
   generatedAt: "2026-07-01T09:00:00+09:00",
   source: "2026年6月21日 対チュニジア戦（4-0勝利）で採用された実際のシステムを基に予測",
   picks: [
-    { playerId: "gk-03", x: 50, y: 83, confidence: 95, reason: "本大会でスタメンを掴んだ守護神。安定したセービングが持ち味。" },
+    { playerId: "gk-03", x: 50, y: 86, confidence: 95, reason: "本大会でスタメンを掴んだ守護神。安定したセービングが持ち味。" },
     { playerId: "df-05", x: 74, y: 70, confidence: 90, reason: "3バック右のCB。対人守備とカバーリングの範囲の広さを評価。" },
     { playerId: "df-03", x: 50, y: 73, confidence: 96, reason: "キャプテンとして最終ラインを統率する中心選手。" },
     { playerId: "df-06", x: 26, y: 70, confidence: 89, reason: "左利きの展開力でビルドアップの起点になれる。" },
