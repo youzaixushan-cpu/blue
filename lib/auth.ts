@@ -23,6 +23,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // Credentials（メール/パスワード）プロバイダーを使うため、セッションはjwt戦略が必須
   // （Auth.jsの仕様上、Credentialsログインのユーザーはdatabaseセッションを持てない）。
   session: { strategy: "jwt" },
+  // Vercelのようなホスティング先はデプロイごとにホスト名が変わり得るため、
+  // リクエストのHostヘッダーを信頼する（単一の自サイトのみで運用するため問題ない）。
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
