@@ -3,9 +3,9 @@ import { PrismaClient, Prisma } from "../lib/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { players } from "../lib/data/players";
 import { recentResults } from "../lib/data/matches";
-import { communitySquads } from "../lib/data/community";
-import { formationTemplates } from "../lib/data/formations";
 import { wikidataIds } from "../lib/data/wikidata-ids";
+import { buildCommunitySampleSubmissions } from "../lib/community-samples";
+import { submitSquad } from "../lib/db/community";
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
@@ -56,36 +56,19 @@ async function main() {
   });
   console.log(`Seeded ${recentResults.length} matches`);
 
-  const playersById = new Map(players.map((p) => [p.id, p]));
-
-  for (const squad of communitySquads) {
-    const formation = formationTemplates.find((f) => f.name === squad.formationName);
-    if (!formation) continue;
-
-    await prisma.communitySubmission.create({
-      data: {
-        formationId: formation.id,
-        authorName: squad.authorName,
-        title: squad.title,
-        likes: squad.likes,
-        createdAt: new Date(squad.createdAt),
-        ipHash: "seed-data",
-        members: {
-          create: squad.topPlayers.map((playerId, index) => {
-            const player = playersById.get(playerId);
-            const slot = formation.slots[index] ?? formation.slots[0];
-            return {
-              slotId: slot.id,
-              playerId,
-              name: player?.name ?? playerId,
-              position: player?.position ?? slot.label,
-            };
-          }),
-        },
-      },
+  // 「みんなの代表」が最初から空/不自然にならないよう、人気選手ほど選ばれやすい
+  // 重み付けをしたフルの11人編成サンプルを、実際の投稿と同じsubmitSquad()経由で投入する。
+  const samples = buildCommunitySampleSubmissions(24);
+  let seededCommunityCount = 0;
+  for (const sample of samples) {
+    const id = await submitSquad(sample);
+    await prisma.communitySubmission.update({
+      where: { id },
+      data: { createdAt: sample.createdAt, likes: sample.likes },
     });
+    seededCommunityCount++;
   }
-  console.log(`Seeded ${communitySquads.length} community submissions`);
+  console.log(`Seeded ${seededCommunityCount} community submissions`);
 }
 
 main()
