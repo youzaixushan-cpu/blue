@@ -197,6 +197,35 @@ export async function getCommunitySquads(limit = 12): Promise<CommunitySquad[]> 
   });
 }
 
+export async function getCommunitySquadCount(): Promise<number> {
+  return prisma.communitySubmission.count();
+}
+
+export async function getTopCommunitySquad(): Promise<CommunitySquad | null> {
+  const submission = await prisma.communitySubmission.findFirst({
+    orderBy: { likes: "desc" },
+    include: { members: true },
+  });
+  if (!submission) return null;
+
+  const formation = getFormationById(submission.formationId);
+  const topPlayers = submission.members
+    .filter((m) => m.playerId)
+    .slice(0, 3)
+    .map((m) => m.playerId as string);
+
+  return {
+    id: submission.id,
+    authorName: submission.authorName,
+    authorAvatarSeed: submission.authorName,
+    formationName: formation?.name ?? submission.formationId,
+    title: submission.title,
+    likes: submission.likes,
+    createdAt: submission.createdAt.toISOString().slice(0, 10),
+    topPlayers,
+  };
+}
+
 export async function getCommunitySquadDetail(id: string): Promise<CommunitySquadDetail | null> {
   const submission = await prisma.communitySubmission.findUnique({
     where: { id },
