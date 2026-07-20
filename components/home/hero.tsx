@@ -1,10 +1,13 @@
 import "./hero.scss";
 import Link from "next/link";
-import { ArrowRight, CalendarClock } from "lucide-react";
+import { ArrowRight, CalendarClock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { upcomingNotice } from "@/lib/data/matches";
+import { aiPrediction } from "@/lib/data/ai-team";
+import { BestXiPitch } from "@/components/ai-team/best-xi-pitch";
+import type { Player } from "@/lib/types";
 
-export function Hero() {
+export function Hero({ players }: { players: Record<string, Player> }) {
   return (
     <section className="hero">
       <div aria-hidden className="hero__glow" />
@@ -41,6 +44,23 @@ export function Hero() {
             {upcomingNotice}
           </p>
         </div>
+
+        <Link href="/ai-team" className="hero__visual">
+          <div className="hero__visual-glow" aria-hidden />
+          <div className="hero__visual-card">
+            <p className="hero__visual-eyebrow">
+              <Sparkles className="hero__visual-eyebrow-icon" />
+              AI代表 最新予想
+            </p>
+            <div className="hero__visual-pitch">
+              <BestXiPitch prediction={aiPrediction} players={players} />
+            </div>
+            <p className="hero__visual-link">
+              {aiPrediction.formationName}のベストイレブンを見る
+              <ArrowRight className="hero__visual-link-icon" />
+            </p>
+          </div>
+        </Link>
       </div>
     </section>
   );

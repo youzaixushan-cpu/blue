@@ -14,7 +14,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      <Hero />
+      <Hero players={playersById} />
       <QuickLinks />
       <StatsHighlight />
       <RecentResults recentResults={recentResults} players={playersById} />
