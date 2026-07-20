@@ -176,7 +176,10 @@
   }
 
   &__cta {
+    height: 3rem;
     border-radius: 9999px;
+    padding-inline: 1.75rem;
+    font-size: 0.9375rem;
 
     &--primary {
       background-color: #fff;
