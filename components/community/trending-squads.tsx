@@ -1,11 +1,8 @@
-"use client";
-
 import "./trending-squads.scss";
-import { useState } from "react";
-import { Heart } from "lucide-react";
-import { toast } from "sonner";
+import Link from "next/link";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
 import { Badge } from "@/components/ui/badge";
+import { LikeButton } from "@/components/community/like-button";
 import type { CommunitySquad, Player } from "@/lib/types";
 
 function formatDate(iso: string) {
@@ -21,27 +18,14 @@ export function TrendingSquads({
   squads: CommunitySquad[];
   players: Record<string, Player>;
 }) {
-  const [likesOverride, setLikesOverride] = useState<Record<string, number>>({});
-
-  async function handleLike(id: string) {
-    try {
-      const res = await fetch(`/api/community/submissions/${id}/like`, { method: "POST" });
-      if (res.status === 409) {
-        toast("この投稿にはすでにいいね済みです");
-        return;
-      }
-      if (!res.ok) throw new Error("failed");
-      const data = (await res.json()) as { likes: number };
-      setLikesOverride((prev) => ({ ...prev, [id]: data.likes }));
-    } catch {
-      toast.error("いいねに失敗しました");
-    }
-  }
-
   return (
     <div className="trending-squads">
       {squads.map((squad) => (
-        <div key={squad.id} className="trending-squads__card">
+        <Link
+          key={squad.id}
+          href={`/community/${squad.id}`}
+          className="trending-squads__card"
+        >
           <div className="trending-squads__header">
             <div className="trending-squads__author">
               <PlayerAvatar label={squad.authorName} seed={squad.authorAvatarSeed} size="sm" />
@@ -73,15 +57,13 @@ export function TrendingSquads({
             })}
           </div>
 
-          <button
-            type="button"
-            onClick={() => handleLike(squad.id)}
+          <LikeButton
+            submissionId={squad.id}
+            initialLikes={squad.likes}
             className="trending-squads__like"
-          >
-            <Heart className="trending-squads__like-icon" />
-            {likesOverride[squad.id] ?? squad.likes}
-          </button>
-        </div>
+            iconClassName="trending-squads__like-icon"
+          />
+        </Link>
       ))}
     </div>
   );

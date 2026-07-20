@@ -10,7 +10,15 @@
 
   &__card {
     @include card-surface;
+    display: block;
     padding: 1.25rem;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s ease;
+
+    &:hover {
+      border-color: color-mix(in oklch, var(--primary) 40%, transparent);
+    }
   }
 
   &__header {

@@ -3,6 +3,17 @@ import { Prisma } from "@/lib/generated/prisma/client";
 import { getFormationById } from "@/lib/data/formations";
 import type { CommunitySquad, FormationRanking, PlayerRanking, Position } from "@/lib/types";
 
+export interface CommunitySquadDetail {
+  id: string;
+  authorName: string;
+  title: string;
+  formationId: string;
+  formationName: string;
+  likes: number;
+  createdAt: string;
+  members: { slotId: string; playerId: string | null; name: string; position: Position }[];
+}
+
 export interface SubmitSquadMemberInput {
   slotId: string;
   playerId: string | null;
@@ -184,4 +195,30 @@ export async function getCommunitySquads(limit = 12): Promise<CommunitySquad[]> 
       topPlayers,
     };
   });
+}
+
+export async function getCommunitySquadDetail(id: string): Promise<CommunitySquadDetail | null> {
+  const submission = await prisma.communitySubmission.findUnique({
+    where: { id },
+    include: { members: true },
+  });
+  if (!submission) return null;
+
+  const formation = getFormationById(submission.formationId);
+
+  return {
+    id: submission.id,
+    authorName: submission.authorName,
+    title: submission.title,
+    formationId: submission.formationId,
+    formationName: formation?.name ?? submission.formationId,
+    likes: submission.likes,
+    createdAt: submission.createdAt.toISOString(),
+    members: submission.members.map((m) => ({
+      slotId: m.slotId,
+      playerId: m.playerId,
+      name: m.name,
+      position: m.position as Position,
+    })),
+  };
 }
