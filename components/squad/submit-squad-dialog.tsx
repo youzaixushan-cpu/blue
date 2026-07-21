@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Share2 } from "lucide-react";
 import { useSquad } from "@/lib/squad-context";
 import { getFormationById } from "@/lib/data/formations";
+import { squadTargetShortLabel } from "@/lib/squad-target";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 
 export function SubmitSquadDialog() {
-  const { formationId, assignments, members } = useSquad();
+  const { formationId, assignments, members, target } = useSquad();
   const [open, setOpen] = useState(false);
   const [authorName, setAuthorName] = useState("");
   const [title, setTitle] = useState("");
@@ -55,7 +56,7 @@ export function SubmitSquadDialog() {
       const res = await fetch("/api/community/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ formationId, authorName, title, members: payloadMembers }),
+        body: JSON.stringify({ formationId, authorName, title, members: payloadMembers, target }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -82,9 +83,9 @@ export function SubmitSquadDialog() {
       </DialogTrigger>
       <DialogContent className="submit-squad-dialog">
         <DialogHeader>
-          <DialogTitle>みんなの代表に投稿</DialogTitle>
+          <DialogTitle>「{squadTargetShortLabel(target)}」をみんなの代表に投稿</DialogTitle>
           <DialogDescription>
-            今組んでいる布陣を「みんなの代表」ページに投稿します。全ポジションに選手を配置してから投稿してください。
+            今組んでいる布陣を「みんなの代表」ページの{squadTargetShortLabel(target)}枠に投稿します。全ポジションに選手を配置してから投稿してください。
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="submit-squad-dialog__form">

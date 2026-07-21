@@ -13,9 +13,9 @@ export default async function HomePage() {
   const [recentResults, players, topSquad, squadCount, rankings] = await Promise.all([
     getRecentResults(),
     getAllPlayers(),
-    getTopCommunitySquad(),
-    getCommunitySquadCount(),
-    getPlayerRankings(),
+    getTopCommunitySquad("next"),
+    getCommunitySquadCount("next"),
+    getPlayerRankings("next"),
   ]);
   const playersById = Object.fromEntries(players.map((p) => [p.id, p]));
   const topRanking = rankings[0] ?? null;

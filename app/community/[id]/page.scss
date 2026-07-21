@@ -39,6 +39,12 @@
     flex-wrap: wrap;
   }
 
+  &__badges {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   &__author {
     display: flex;
     align-items: center;

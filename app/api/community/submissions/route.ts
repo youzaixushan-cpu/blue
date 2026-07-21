@@ -6,12 +6,14 @@ import {
   type SubmitSquadMemberInput,
 } from "@/lib/db/community";
 import { getClientIp, hashIp } from "@/lib/rate-limit";
+import { isSquadTarget } from "@/lib/squad-target";
 
 interface SubmitSquadRequestBody {
   formationId?: unknown;
   authorName?: unknown;
   title?: unknown;
   members?: unknown;
+  target?: unknown;
 }
 
 function isMemberInput(value: unknown): value is SubmitSquadMemberInput {
@@ -39,6 +41,9 @@ export async function POST(request: Request) {
   if (!body.members.every(isMemberInput)) {
     return NextResponse.json({ error: "members の形式が正しくありません" }, { status: 400 });
   }
+  if (!isSquadTarget(body.target)) {
+    return NextResponse.json({ error: "target は必須です" }, { status: 400 });
+  }
 
   try {
     const ipHash = hashIp(getClientIp(request));
@@ -48,6 +53,7 @@ export async function POST(request: Request) {
       title: typeof body.title === "string" ? body.title : undefined,
       members: body.members,
       ipHash,
+      target: body.target,
     });
     return NextResponse.json({ id }, { status: 201 });
   } catch (error) {

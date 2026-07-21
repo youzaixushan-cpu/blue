@@ -1,8 +1,10 @@
 import "./page.scss";
 import type { Metadata } from "next";
 import { getAllPlayers } from "@/lib/db/players";
-import { aiPrediction } from "@/lib/data/ai-team";
+import { aiPredictions } from "@/lib/data/ai-team";
+import { DEFAULT_SQUAD_TARGET, isSquadTarget } from "@/lib/squad-target";
 import { SectionHeading } from "@/components/shared/section-heading";
+import { TargetLinkTabs } from "@/components/shared/target-link-tabs";
 import { BestXiPitch } from "@/components/ai-team/best-xi-pitch";
 import { PickList } from "@/components/ai-team/pick-list";
 
@@ -23,7 +25,15 @@ function formatDate(iso: string) {
   }).format(new Date(iso));
 }
 
-export default async function AiTeamPage() {
+interface AiTeamPageProps {
+  searchParams: Promise<{ target?: string }>;
+}
+
+export default async function AiTeamPage({ searchParams }: AiTeamPageProps) {
+  const { target: rawTarget } = await searchParams;
+  const target = isSquadTarget(rawTarget) ? rawTarget : DEFAULT_SQUAD_TARGET;
+  const prediction = aiPredictions[target];
+
   const players = await getAllPlayers();
   const playersById = Object.fromEntries(players.map((p) => [p.id, p]));
 
@@ -33,17 +43,18 @@ export default async function AiTeamPage() {
         eyebrow="AI Prediction"
         title="AI代表"
         description="直近の代表戦データをもとにした、現時点で最も可能性の高いベストイレブンです。"
+        action={<TargetLinkTabs active={target} basePath="/ai-team" />}
         className="ai-team-page__heading"
       />
       <p className="ai-team-page__updated">
-        最終更新: {formatDate(aiPrediction.generatedAt)} ・ フォーメーション:{" "}
-        {aiPrediction.formationName}
+        最終更新: {formatDate(prediction.generatedAt)} ・ フォーメーション:{" "}
+        {prediction.formationName}
       </p>
-      <p className="ai-team-page__source">{aiPrediction.source}</p>
+      <p className="ai-team-page__source">{prediction.source}</p>
 
       <div className="ai-team-page__layout">
-        <BestXiPitch prediction={aiPrediction} players={playersById} />
-        <PickList prediction={aiPrediction} players={playersById} />
+        <BestXiPitch prediction={prediction} players={playersById} />
+        <PickList prediction={prediction} players={playersById} />
       </div>
     </div>
   );

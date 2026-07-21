@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db/client";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { getFormationById } from "@/lib/data/formations";
+import type { SquadTarget } from "@/lib/squad-target";
 import type { CommunitySquad, FormationRanking, PlayerRanking, Position } from "@/lib/types";
 
 export interface CommunitySquadDetail {
@@ -11,6 +12,7 @@ export interface CommunitySquadDetail {
   formationName: string;
   likes: number;
   createdAt: string;
+  target: SquadTarget;
   members: { slotId: string; playerId: string | null; name: string; position: Position }[];
 }
 
@@ -27,6 +29,7 @@ export interface SubmitSquadInput {
   title?: string;
   members: SubmitSquadMemberInput[];
   ipHash: string;
+  target: SquadTarget;
 }
 
 const SUBMIT_RATE_LIMIT_MAX = 5;
@@ -48,6 +51,7 @@ export async function submitSquad(input: SubmitSquadInput): Promise<string> {
     throw new SubmitSquadValidationError("選手名が空のスロットがあります");
   }
 
+  // レート制限は次回選考/2030年W杯の両トラック合算でカウントする（対象別に分けない、シンプルさ優先）
   const recentCount = await prisma.communitySubmission.count({
     where: {
       ipHash: input.ipHash,
@@ -67,6 +71,7 @@ export async function submitSquad(input: SubmitSquadInput): Promise<string> {
       authorName,
       title,
       ipHash: input.ipHash,
+      target: input.target,
       members: {
         create: input.members.map((m) => ({
           slotId: m.slotId,
@@ -98,15 +103,15 @@ export async function likeSubmission(id: string, ipHash: string): Promise<number
   return updated.likes;
 }
 
-// 「上昇/下降/変化なし」は前回このランキングを計算した時点の順位（PlayerRankStat）との比較で決まる。
+// 「上昇/下降/変化なし」は前回このランキングを計算した時点の順位（PlayerRankStat、target別）との比較で決まる。
 // 呼び出すたびに現在の順位を新しい基準値として保存し直すため、「前回表示時からの変化」を表す。
-export async function getPlayerRankings(): Promise<PlayerRanking[]> {
-  const totalSubmissions = await prisma.communitySubmission.count();
+export async function getPlayerRankings(target: SquadTarget): Promise<PlayerRanking[]> {
+  const totalSubmissions = await prisma.communitySubmission.count({ where: { target } });
   if (totalSubmissions === 0) return [];
 
   const grouped = await prisma.communitySubmissionMember.groupBy({
     by: ["playerId"],
-    where: { playerId: { not: null } },
+    where: { playerId: { not: null }, submission: { target } },
     _count: { _all: true },
   });
 
@@ -123,7 +128,7 @@ export async function getPlayerRankings(): Promise<PlayerRanking[]> {
   if (ranked.length === 0) return [];
 
   const stats = await prisma.playerRankStat.findMany({
-    where: { playerId: { in: ranked.map((r) => r.playerId) } },
+    where: { target, playerId: { in: ranked.map((r) => r.playerId) } },
   });
   const lastRankByPlayer = new Map(stats.map((s) => [s.playerId, s.lastRank]));
 
@@ -140,9 +145,9 @@ export async function getPlayerRankings(): Promise<PlayerRanking[]> {
   await Promise.all(
     ranked.map((r) =>
       prisma.playerRankStat.upsert({
-        where: { playerId: r.playerId },
+        where: { playerId_target: { playerId: r.playerId, target } },
         update: { lastRank: r.rank },
-        create: { playerId: r.playerId, lastRank: r.rank },
+        create: { playerId: r.playerId, target, lastRank: r.rank },
       }),
     ),
   );
@@ -150,12 +155,13 @@ export async function getPlayerRankings(): Promise<PlayerRanking[]> {
   return result;
 }
 
-export async function getFormationRankings(): Promise<FormationRanking[]> {
-  const total = await prisma.communitySubmission.count();
+export async function getFormationRankings(target: SquadTarget): Promise<FormationRanking[]> {
+  const total = await prisma.communitySubmission.count({ where: { target } });
   if (total === 0) return [];
 
   const grouped = await prisma.communitySubmission.groupBy({
     by: ["formationId"],
+    where: { target },
     _count: { _all: true },
   });
 
@@ -170,8 +176,9 @@ export async function getFormationRankings(): Promise<FormationRanking[]> {
     }));
 }
 
-export async function getCommunitySquads(limit = 12): Promise<CommunitySquad[]> {
+export async function getCommunitySquads(target: SquadTarget, limit = 12): Promise<CommunitySquad[]> {
   const submissions = await prisma.communitySubmission.findMany({
+    where: { target },
     orderBy: { createdAt: "desc" },
     take: limit,
     include: { members: true },
@@ -197,12 +204,13 @@ export async function getCommunitySquads(limit = 12): Promise<CommunitySquad[]> 
   });
 }
 
-export async function getCommunitySquadCount(): Promise<number> {
-  return prisma.communitySubmission.count();
+export async function getCommunitySquadCount(target: SquadTarget): Promise<number> {
+  return prisma.communitySubmission.count({ where: { target } });
 }
 
-export async function getTopCommunitySquad(): Promise<CommunitySquad | null> {
+export async function getTopCommunitySquad(target: SquadTarget): Promise<CommunitySquad | null> {
   const submission = await prisma.communitySubmission.findFirst({
+    where: { target },
     orderBy: { likes: "desc" },
     include: { members: true },
   });
@@ -243,6 +251,7 @@ export async function getCommunitySquadDetail(id: string): Promise<CommunitySqua
     formationName: formation?.name ?? submission.formationId,
     likes: submission.likes,
     createdAt: submission.createdAt.toISOString(),
+    target: submission.target as SquadTarget,
     members: submission.members.map((m) => ({
       slotId: m.slotId,
       playerId: m.playerId,

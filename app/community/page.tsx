@@ -2,7 +2,9 @@ import "./page.scss";
 import type { Metadata } from "next";
 import { getPlayerRankings, getFormationRankings, getCommunitySquads } from "@/lib/db/community";
 import { getAllPlayers } from "@/lib/db/players";
+import { DEFAULT_SQUAD_TARGET, isSquadTarget } from "@/lib/squad-target";
 import { SectionHeading } from "@/components/shared/section-heading";
+import { TargetLinkTabs } from "@/components/shared/target-link-tabs";
 import { PlayerRankingList } from "@/components/community/player-ranking-list";
 import { FormationRankingList } from "@/components/community/formation-ranking";
 import { TrendingSquads } from "@/components/community/trending-squads";
@@ -15,11 +17,18 @@ export const metadata: Metadata = {
   description: "全国のファンが選んだ「あなたの26人」を集計。人気選手・人気フォーメーションが分かります。",
 };
 
-export default async function CommunityPage() {
+interface CommunityPageProps {
+  searchParams: Promise<{ target?: string }>;
+}
+
+export default async function CommunityPage({ searchParams }: CommunityPageProps) {
+  const { target: rawTarget } = await searchParams;
+  const target = isSquadTarget(rawTarget) ? rawTarget : DEFAULT_SQUAD_TARGET;
+
   const [playerRankings, formationRankings, communitySquads, players] = await Promise.all([
-    getPlayerRankings(),
-    getFormationRankings(),
-    getCommunitySquads(),
+    getPlayerRankings(target),
+    getFormationRankings(target),
+    getCommunitySquads(target),
     getAllPlayers(),
   ]);
   const playersById = Object.fromEntries(players.map((p) => [p.id, p]));
@@ -30,6 +39,7 @@ export default async function CommunityPage() {
         eyebrow="Community"
         title="みんなの代表"
         description="全国のファンが選んだ「あなたの26人」を集計。人気選手・人気フォーメーションが分かります。"
+        action={<TargetLinkTabs active={target} basePath="/community" />}
       />
 
       <section>

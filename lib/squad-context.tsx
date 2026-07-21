@@ -12,8 +12,9 @@ import {
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import type { Player, Position, RosterMember } from "@/lib/types";
+import { DEFAULT_SQUAD_TARGET, isSquadTarget, type SquadTarget } from "@/lib/squad-target";
 
-const STORAGE_KEY = "samurai-squad-v4";
+const STORAGE_KEY = "samurai-squad-v5";
 const MAX_SQUAD_SIZE = 26;
 const DEFAULT_FORMATION_ID = "f-433";
 
@@ -23,11 +24,23 @@ interface SquadState {
   assignmentsByFormation: Record<string, Record<string, string>>;
 }
 
-const DEFAULT_STATE: SquadState = {
+const DEFAULT_SQUAD_STATE: SquadState = {
   members: [],
   formationId: DEFAULT_FORMATION_ID,
   assignmentsByFormation: {},
 };
+
+type SquadStateByTarget = Record<SquadTarget, SquadState>;
+
+interface StoredBlob {
+  next?: Partial<SquadState>;
+  "2030"?: Partial<SquadState>;
+  activeTarget?: SquadTarget;
+}
+
+function normalizeSquadState(raw: Partial<SquadState> | null | undefined): SquadState {
+  return { ...DEFAULT_SQUAD_STATE, ...raw };
+}
 
 interface SquadContextValue {
   players: Player[];
@@ -41,6 +54,8 @@ interface SquadContextValue {
   unassignSlot: (slotId: string) => void;
   clearSquad: () => void;
   isHydrated: boolean;
+  target: SquadTarget;
+  setTarget: (target: SquadTarget) => void;
 }
 
 const SquadContext = createContext<SquadContextValue | null>(null);
@@ -52,7 +67,11 @@ export function SquadProvider({
   children: ReactNode;
   players: Player[];
 }) {
-  const [state, setState] = useState<SquadState>(DEFAULT_STATE);
+  const [state, setState] = useState<SquadStateByTarget>({
+    next: DEFAULT_SQUAD_STATE,
+    "2030": DEFAULT_SQUAD_STATE,
+  });
+  const [activeTarget, setActiveTarget] = useState<SquadTarget>(DEFAULT_SQUAD_TARGET);
   const [isHydrated, setIsHydrated] = useState(false);
   const { status } = useSession();
   const hasReconciledRef = useRef(false);
@@ -62,10 +81,16 @@ export function SquadProvider({
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as SquadState;
+        const parsed = JSON.parse(raw) as StoredBlob;
         // localStorage（外部システム）からの初回同期のため、マウント時に一度だけ実行
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setState({ ...DEFAULT_STATE, ...parsed });
+        setState({
+          next: normalizeSquadState(parsed.next),
+          "2030": normalizeSquadState(parsed["2030"]),
+        });
+        if (isSquadTarget(parsed.activeTarget)) {
+          setActiveTarget(parsed.activeTarget);
+        }
       }
     } catch {
       // 破損データは無視してデフォルトを使用
@@ -76,11 +101,14 @@ export function SquadProvider({
 
   useEffect(() => {
     if (!isHydrated) return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state, isHydrated]);
+    const blob: StoredBlob = { ...state, activeTarget };
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(blob));
+  }, [state, activeTarget, isHydrated]);
 
-  // ログイン時: サーバー側に保存済みのデータがあればそれを採用し、
-  // 何も保存されていない（初回ログイン）場合はローカルの内容を一度だけサーバーへ移行する。
+  // ログイン時: next/2030それぞれ独立に「サーバーに保存済みのデータがあればそれを採用、
+  // 無ければ（初回ログイン）ローカルの内容を一度だけサーバーへ移行する」を判定する。
+  // 片方のtargetにサーバーデータが無いからといって、もう片方のローカルデータまで
+  // 巻き込んで上書き・破棄しないようにするため、2つのtargetを混ぜずに個別処理する。
   // 未ログイン時は今まで通りlocalStorageのみで動作し、一切サーバーへ通信しない。
   useEffect(() => {
     if (status !== "authenticated" || hasReconciledRef.current) return;
@@ -90,24 +118,41 @@ export function SquadProvider({
       try {
         const res = await fetch("/api/squad");
         if (!res.ok) return;
-        const data = (await res.json()) as { state: SquadState | null };
-        if (data.state) {
-          setState({ ...DEFAULT_STATE, ...data.state });
-          return;
-        }
+        const data = (await res.json()) as {
+          next: Partial<SquadState> | null;
+          "2030": Partial<SquadState> | null;
+        };
 
-        let localState: SquadState | null = null;
+        let localBlob: StoredBlob | null = null;
         try {
           const raw = window.localStorage.getItem(STORAGE_KEY);
-          if (raw) localState = JSON.parse(raw) as SquadState;
+          if (raw) localBlob = JSON.parse(raw) as StoredBlob;
         } catch {
           // 破損データは無視
         }
-        if (localState && localState.members.length > 0) {
+
+        const nextTargetState =
+          data.next !== null ? normalizeSquadState(data.next) : normalizeSquadState(localBlob?.next);
+        const target2030State =
+          data["2030"] !== null
+            ? normalizeSquadState(data["2030"])
+            : normalizeSquadState(localBlob?.["2030"]);
+
+        setState({ next: nextTargetState, "2030": target2030State });
+
+        // サーバーに無く、ローカルにだけデータがあったtargetのみ一度だけ移行する
+        const toMigrate: Partial<SquadStateByTarget> = {};
+        if (data.next === null && nextTargetState.members.length > 0) {
+          toMigrate.next = nextTargetState;
+        }
+        if (data["2030"] === null && target2030State.members.length > 0) {
+          toMigrate["2030"] = target2030State;
+        }
+        if (Object.keys(toMigrate).length > 0) {
           await fetch("/api/squad", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ state: localState }),
+            body: JSON.stringify(toMigrate),
           });
         }
       } catch {
@@ -116,7 +161,8 @@ export function SquadProvider({
     })();
   }, [status]);
 
-  // ログイン中の変更をサーバーへデバウンスして同期する
+  // ログイン中の変更をサーバーへデバウンスして同期する（next/2030両方まとめて送信。
+  // この規模のアプリでは書き込み量として問題にならないため、変更されていない方も毎回含めてシンプルに保つ）
   useEffect(() => {
     if (!isHydrated || status !== "authenticated") return;
     if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
@@ -124,7 +170,7 @@ export function SquadProvider({
       fetch("/api/squad", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ state }),
+        body: JSON.stringify(state),
       }).catch(() => {
         // 同期失敗時もローカルには保存済みなので致命的ではない
       });
@@ -135,12 +181,15 @@ export function SquadProvider({
   }, [state, isHydrated, status]);
 
   const value = useMemo<SquadContextValue>(() => {
+    const current = state[activeTarget];
+
     const addMember = (rawName: string, position: Position) => {
       const name = rawName.trim();
       if (!name) return;
 
       setState((prev) => {
-        if (prev.members.length >= MAX_SQUAD_SIZE) {
+        const targetState = prev[activeTarget];
+        if (targetState.members.length >= MAX_SQUAD_SIZE) {
           toast.error("あなたの26人はすでに定員です。誰かを外してから追加してください。");
           return prev;
         }
@@ -148,7 +197,7 @@ export function SquadProvider({
         const matched = players.find((p) => p.name === name);
 
         if (matched) {
-          if (prev.members.some((m) => m.playerId === matched.id)) {
+          if (targetState.members.some((m) => m.playerId === matched.id)) {
             toast.error(`${matched.name}はすでに追加されています。`);
             return prev;
           }
@@ -162,7 +211,10 @@ export function SquadProvider({
             playerId: matched.id,
           };
           toast.success(`${matched.name}を追加しました`);
-          return { ...prev, members: [...prev.members, member] };
+          return {
+            ...prev,
+            [activeTarget]: { ...targetState, members: [...targetState.members, member] },
+          };
         }
 
         const member: RosterMember = {
@@ -173,46 +225,60 @@ export function SquadProvider({
           club: "未登録",
         };
         toast.success(`${name}を予想メンバーとして追加しました`);
-        return { ...prev, members: [...prev.members, member] };
+        return {
+          ...prev,
+          [activeTarget]: { ...targetState, members: [...targetState.members, member] },
+        };
       });
     };
 
     const removeMember = (memberId: string) => {
       setState((prev) => {
+        const targetState = prev[activeTarget];
         const assignmentsByFormation = Object.fromEntries(
-          Object.entries(prev.assignmentsByFormation).map(([formationId, assignments]) => [
+          Object.entries(targetState.assignmentsByFormation).map(([formationId, assignments]) => [
             formationId,
-            Object.fromEntries(
-              Object.entries(assignments).filter(([, id]) => id !== memberId),
-            ),
+            Object.fromEntries(Object.entries(assignments).filter(([, id]) => id !== memberId)),
           ]),
         );
         return {
           ...prev,
-          members: prev.members.filter((m) => m.id !== memberId),
-          assignmentsByFormation,
+          [activeTarget]: {
+            ...targetState,
+            members: targetState.members.filter((m) => m.id !== memberId),
+            assignmentsByFormation,
+          },
         };
       });
     };
 
     const setFormationId = (id: string) => {
-      setState((prev) => ({ ...prev, formationId: id }));
+      setState((prev) => ({
+        ...prev,
+        [activeTarget]: { ...prev[activeTarget], formationId: id },
+      }));
     };
 
     const assignMember = (slotId: string, memberId: string) => {
       setState((prev) => {
-        const current = { ...(prev.assignmentsByFormation[prev.formationId] ?? {}) };
-        for (const [existingSlot, existingMemberId] of Object.entries(current)) {
+        const targetState = prev[activeTarget];
+        const currentAssignments = {
+          ...(targetState.assignmentsByFormation[targetState.formationId] ?? {}),
+        };
+        for (const [existingSlot, existingMemberId] of Object.entries(currentAssignments)) {
           if (existingMemberId === memberId && existingSlot !== slotId) {
-            delete current[existingSlot];
+            delete currentAssignments[existingSlot];
           }
         }
-        current[slotId] = memberId;
+        currentAssignments[slotId] = memberId;
         return {
           ...prev,
-          assignmentsByFormation: {
-            ...prev.assignmentsByFormation,
-            [prev.formationId]: current,
+          [activeTarget]: {
+            ...targetState,
+            assignmentsByFormation: {
+              ...targetState.assignmentsByFormation,
+              [targetState.formationId]: currentAssignments,
+            },
           },
         };
       });
@@ -220,42 +286,50 @@ export function SquadProvider({
 
     const unassignSlot = (slotId: string) => {
       setState((prev) => {
-        const current = { ...(prev.assignmentsByFormation[prev.formationId] ?? {}) };
-        delete current[slotId];
+        const targetState = prev[activeTarget];
+        const currentAssignments = {
+          ...(targetState.assignmentsByFormation[targetState.formationId] ?? {}),
+        };
+        delete currentAssignments[slotId];
         return {
           ...prev,
-          assignmentsByFormation: {
-            ...prev.assignmentsByFormation,
-            [prev.formationId]: current,
+          [activeTarget]: {
+            ...targetState,
+            assignmentsByFormation: {
+              ...targetState.assignmentsByFormation,
+              [targetState.formationId]: currentAssignments,
+            },
           },
         };
       });
     };
 
-    // ピッチの配置だけでなく、ベンチも含めた「あなたの26人」全員を削除する
+    // ピッチの配置だけでなく、ベンチも含めた選択中ターゲットの「あなたの26人」全員を削除する
+    // （もう一方のターゲットの編成には影響しない）
     const clearSquad = () => {
       setState((prev) => ({
         ...prev,
-        members: [],
-        assignmentsByFormation: {},
+        [activeTarget]: { ...prev[activeTarget], members: [], assignmentsByFormation: {} },
       }));
       toast.success("あなたの26人をすべてクリアしました");
     };
 
     return {
       players,
-      members: state.members,
+      members: current.members,
       addMember,
       removeMember,
-      formationId: state.formationId,
+      formationId: current.formationId,
       setFormationId,
-      assignments: state.assignmentsByFormation[state.formationId] ?? {},
+      assignments: current.assignmentsByFormation[current.formationId] ?? {},
       assignMember,
       unassignSlot,
       clearSquad,
       isHydrated,
+      target: activeTarget,
+      setTarget: setActiveTarget,
     };
-  }, [state, isHydrated, players]);
+  }, [state, activeTarget, isHydrated, players]);
 
   return <SquadContext.Provider value={value}>{children}</SquadContext.Provider>;
 }

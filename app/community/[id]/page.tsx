@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { getCommunitySquadDetail } from "@/lib/db/community";
 import { getFormationById } from "@/lib/data/formations";
 import { getAllPlayers } from "@/lib/db/players";
+import { squadTargetShortLabel } from "@/lib/squad-target";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
 import { Badge } from "@/components/ui/badge";
 import { SquadDetailPitch } from "@/components/community/squad-detail-pitch";
@@ -62,7 +63,10 @@ export default async function CommunitySquadDetailPage({
             </p>
           </div>
         </div>
-        <Badge variant="secondary">{detail.formationName}</Badge>
+        <div className="squad-detail-page__badges">
+          <Badge variant="secondary">{squadTargetShortLabel(detail.target)}</Badge>
+          <Badge variant="secondary">{detail.formationName}</Badge>
+        </div>
       </div>
 
       <h1 className="squad-detail-page__title">{detail.title}</h1>

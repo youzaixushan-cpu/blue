@@ -5,6 +5,7 @@ import { formationTemplates } from "@/lib/data/formations";
 import { players } from "@/lib/data/players";
 import type { Position } from "@/lib/types";
 import type { SubmitSquadMemberInput } from "@/lib/db/community";
+import type { SquadTarget } from "@/lib/squad-target";
 
 type Tier = "star" | "mid" | "low";
 
@@ -104,9 +105,13 @@ export interface CommunitySampleSubmission {
   ipHash: string;
   createdAt: Date;
   likes: number;
+  target: SquadTarget;
 }
 
-export function buildCommunitySampleSubmissions(count: number): CommunitySampleSubmission[] {
+export function buildCommunitySampleSubmissions(
+  count: number,
+  target: SquadTarget,
+): CommunitySampleSubmission[] {
   const formationPool = Object.entries(FORMATION_WEIGHTS).map(([id, weight]) => ({ item: id, weight }));
   const samples: CommunitySampleSubmission[] = [];
 
@@ -139,9 +144,12 @@ export function buildCommunitySampleSubmissions(count: number): CommunitySampleS
       authorName: AUTHOR_NAMES[i % AUTHOR_NAMES.length],
       title: TITLES[i % TITLES.length],
       members,
-      ipHash: `sample-fan-${i}`,
+      // targetを含めることで、next/2030を別々に生成してもipHashが衝突して
+      // レート制限（submitSquad内、1時間5件/IP）に引っかからないようにする
+      ipHash: `sample-fan-${target}-${i}`,
       createdAt: randomPastDate(21),
       likes: Math.floor(Math.random() * 350),
+      target,
     });
   }
 

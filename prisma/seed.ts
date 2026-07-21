@@ -58,7 +58,11 @@ async function main() {
 
   // 「みんなの代表」が最初から空/不自然にならないよう、人気選手ほど選ばれやすい
   // 重み付けをしたフルの11人編成サンプルを、実際の投稿と同じsubmitSquad()経由で投入する。
-  const samples = buildCommunitySampleSubmissions(24);
+  // next（次回選考）より2030（2030年W杯）はまだ新しいトラックという体で件数を少なめにする。
+  const samples = [
+    ...buildCommunitySampleSubmissions(24, "next"),
+    ...buildCommunitySampleSubmissions(16, "2030"),
+  ];
   let seededCommunityCount = 0;
   for (const sample of samples) {
     const id = await submitSquad(sample);

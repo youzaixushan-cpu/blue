@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useSquad } from "@/lib/squad-context";
 import { getFormationById } from "@/lib/data/formations";
+import { squadTargetShortLabel } from "@/lib/squad-target";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { ProfileCard } from "@/components/mypage/profile-card";
 import { SummaryStats } from "@/components/mypage/summary-stats";
@@ -13,7 +14,7 @@ import { Button } from "@/components/ui/button";
 
 export default function MyPage() {
   const { data: session, status } = useSession();
-  const { members, assignments, formationId } = useSquad();
+  const { members, assignments, formationId, target } = useSquad();
 
   if (status === "loading") {
     return <div className="mypage-page" />;
@@ -55,6 +56,7 @@ export default function MyPage() {
         squadCount={members.length}
         assignedCount={Object.keys(assignments).length}
         formationName={formation?.name ?? "-"}
+        targetLabel={squadTargetShortLabel(target)}
       />
       <SettingsList />
     </div>

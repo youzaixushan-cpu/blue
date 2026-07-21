@@ -16,6 +16,7 @@ import { toPng } from "html-to-image";
 import { Download, RotateCcw, X as XIcon } from "lucide-react";
 import { useSquad } from "@/lib/squad-context";
 import { getFormationById } from "@/lib/data/formations";
+import { SQUAD_TARGETS, squadTargetShortLabel, type SquadTarget } from "@/lib/squad-target";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { GuestNotice } from "@/components/auth/guest-notice";
 import { SquadSummaryBar } from "@/components/squad/squad-summary-bar";
@@ -26,6 +27,7 @@ import { Pitch } from "@/components/formation/pitch";
 import { PlayerPool, POOL_ZONE_ID } from "@/components/formation/player-pool";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Position, RosterMember } from "@/lib/types";
 
 const POSITION_ORDER: Position[] = ["GK", "DF", "MF", "FW"];
@@ -42,6 +44,8 @@ export default function MySquadPage() {
     unassignSlot,
     clearSquad,
     isHydrated,
+    target,
+    setTarget,
   } = useSquad();
 
   const [activeMember, setActiveMember] = useState<RosterMember | null>(null);
@@ -58,7 +62,7 @@ export default function MySquadPage() {
     try {
       const dataUrl = await toPng(pitchRef.current, { pixelRatio: 2 });
       const link = document.createElement("a");
-      link.download = `samurai-blue-squad-${formationId}.png`;
+      link.download = `samurai-blue-squad-${target}-${formationId}.png`;
       link.href = dataUrl;
       link.click();
     } catch {
@@ -73,7 +77,8 @@ export default function MySquadPage() {
   }
 
   function handleShareX() {
-    const text = `${formation ? formation.name + "で" : ""}「あなたの26人」を作りました！ #SAMURAIBLUE`;
+    const targetLabel = squadTargetShortLabel(target);
+    const text = `${formation ? formation.name + "で" : ""}「${targetLabel}」の あなたの26人 を作りました！ #SAMURAIBLUE`;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(siteUrl)}`;
     window.open(intent, "_blank", "noopener,noreferrer");
@@ -124,6 +129,17 @@ export default function MySquadPage() {
         eyebrow="Your Squad"
         title="あなたの26人"
         description="登録選手に関係なく、あなたの予想を自由に追加できます。名前を入力して追加し、フォーメーションの枠にドラッグして配置しましょう。"
+        action={
+          <Tabs value={target} onValueChange={(v) => setTarget(v as SquadTarget)}>
+            <TabsList>
+              {SQUAD_TARGETS.map((t) => (
+                <TabsTrigger key={t.value} value={t.value}>
+                  {t.shortLabel}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        }
         className="my-squad-page__heading"
       />
 

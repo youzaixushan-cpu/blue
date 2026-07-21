@@ -60,10 +60,13 @@ model CommunitySubmission {
   createdAt   DateTime                    @default(now())
   // 投稿元のIPをハッシュ化した値（レート制限用。生IPは保存しない）
   ipHash      String
+  // "next"（次回選考）または "2030"（2030年W杯）。lib/squad-target.tsのSquadTargetと対応
+  target      String                      @default("next")
   members     CommunitySubmissionMember[]
   likedBy     CommunitySubmissionLike[]
 
   @@index([ipHash, createdAt])
+  @@index([target, createdAt])
 }
 
 model CommunitySubmissionMember {
@@ -77,8 +80,11 @@ model CommunitySubmissionMember {
 }
 
 model PlayerRankStat {
-  playerId String @id
+  playerId String
+  target   String @default("next")
   lastRank Int
+
+  @@id([playerId, target])
 }
 
 // 同一訪問者（IPハッシュ）による同一投稿への連打いいねを防止するための記録
@@ -107,7 +113,7 @@ model User {
 
   accounts Account[]
   sessions Session[]
-  squad    UserSquad?
+  squad    UserSquad[]
 }
 
 model Account {
@@ -144,9 +150,13 @@ model VerificationToken {
 
 // 「あなたの26人」のアカウント連携保存。ログイン中はここに同期し、どの端末からでも同じ内容を見られるようにする。
 // stateには従来lib/squad-context.tsxがlocalStorageに保存していたのと同じ形（members/formationId/assignmentsByFormation）をそのまま入れる。
+// target（"next"/"2030"）ごとに別々の行を持つ＝ユーザーは最大2つの独立した編成を保存できる。
 model UserSquad {
-  userId    String   @id
+  userId    String
+  target    String   @default("next")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   state     Json
   updatedAt DateTime @updatedAt
+
+  @@id([userId, target])
 }

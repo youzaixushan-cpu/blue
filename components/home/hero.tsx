@@ -3,9 +3,11 @@ import Link from "next/link";
 import { ArrowRight, CalendarClock, Flame, Sparkles, TrendingUp, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { upcomingNotice } from "@/lib/data/matches";
-import { aiPrediction } from "@/lib/data/ai-team";
+import { aiPredictions } from "@/lib/data/ai-team";
 import { BestXiPitch } from "@/components/ai-team/best-xi-pitch";
 import type { CommunitySquad, Player, PlayerRanking } from "@/lib/types";
+
+const aiPrediction = aiPredictions.next;
 
 interface HeroProps {
   players: Record<string, Player>;
