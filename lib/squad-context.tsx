@@ -22,12 +22,14 @@ interface SquadState {
   members: RosterMember[];
   formationId: string;
   assignmentsByFormation: Record<string, Record<string, string>>;
+  benchAssignmentsByFormation: Record<string, Record<string, string>>;
 }
 
 const DEFAULT_SQUAD_STATE: SquadState = {
   members: [],
   formationId: DEFAULT_FORMATION_ID,
   assignmentsByFormation: {},
+  benchAssignmentsByFormation: {},
 };
 
 type SquadStateByTarget = Record<SquadTarget, SquadState>;
@@ -42,6 +44,21 @@ function normalizeSquadState(raw: Partial<SquadState> | null | undefined): Squad
   return { ...DEFAULT_SQUAD_STATE, ...raw };
 }
 
+// 指定したmemberIdを、そのマップ内のどのスロットに割り当てられていても取り除く
+// （1人が同じ役割（スタメン or ベンチ）内で複数スロットを兼任しないようにするための共通ロジック）
+function stripMemberFromMap(
+  map: Record<string, string>,
+  memberId: string,
+): Record<string, string> {
+  const next = { ...map };
+  for (const [slotId, existingMemberId] of Object.entries(next)) {
+    if (existingMemberId === memberId) {
+      delete next[slotId];
+    }
+  }
+  return next;
+}
+
 interface SquadContextValue {
   players: Player[];
   members: RosterMember[];
@@ -52,6 +69,9 @@ interface SquadContextValue {
   assignments: Record<string, string>;
   assignMember: (slotId: string, memberId: string) => void;
   unassignSlot: (slotId: string) => void;
+  benchAssignments: Record<string, string>;
+  assignBench: (slotId: string, memberId: string) => void;
+  unassignBench: (slotId: string) => void;
   clearSquad: () => void;
   isHydrated: boolean;
   target: SquadTarget;
@@ -241,12 +261,19 @@ export function SquadProvider({
             Object.fromEntries(Object.entries(assignments).filter(([, id]) => id !== memberId)),
           ]),
         );
+        const benchAssignmentsByFormation = Object.fromEntries(
+          Object.entries(targetState.benchAssignmentsByFormation).map(([formationId, assignments]) => [
+            formationId,
+            Object.fromEntries(Object.entries(assignments).filter(([, id]) => id !== memberId)),
+          ]),
+        );
         return {
           ...prev,
           [activeTarget]: {
             ...targetState,
             members: targetState.members.filter((m) => m.id !== memberId),
             assignmentsByFormation,
+            benchAssignmentsByFormation,
           },
         };
       });
@@ -259,25 +286,31 @@ export function SquadProvider({
       }));
     };
 
+    // スタメンに割り当てる。同じ選手が他のスタメン枠・ベンチ枠にいた場合はそちらから外す
+    // （1人がスタメンとベンチを同時に兼任しないようにするため）。
     const assignMember = (slotId: string, memberId: string) => {
       setState((prev) => {
         const targetState = prev[activeTarget];
-        const currentAssignments = {
-          ...(targetState.assignmentsByFormation[targetState.formationId] ?? {}),
-        };
-        for (const [existingSlot, existingMemberId] of Object.entries(currentAssignments)) {
-          if (existingMemberId === memberId && existingSlot !== slotId) {
-            delete currentAssignments[existingSlot];
-          }
-        }
-        currentAssignments[slotId] = memberId;
+        const starterMap = stripMemberFromMap(
+          targetState.assignmentsByFormation[targetState.formationId] ?? {},
+          memberId,
+        );
+        starterMap[slotId] = memberId;
+        const benchMap = stripMemberFromMap(
+          targetState.benchAssignmentsByFormation[targetState.formationId] ?? {},
+          memberId,
+        );
         return {
           ...prev,
           [activeTarget]: {
             ...targetState,
             assignmentsByFormation: {
               ...targetState.assignmentsByFormation,
-              [targetState.formationId]: currentAssignments,
+              [targetState.formationId]: starterMap,
+            },
+            benchAssignmentsByFormation: {
+              ...targetState.benchAssignmentsByFormation,
+              [targetState.formationId]: benchMap,
             },
           },
         };
@@ -287,29 +320,84 @@ export function SquadProvider({
     const unassignSlot = (slotId: string) => {
       setState((prev) => {
         const targetState = prev[activeTarget];
-        const currentAssignments = {
+        const starterMap = {
           ...(targetState.assignmentsByFormation[targetState.formationId] ?? {}),
         };
-        delete currentAssignments[slotId];
+        delete starterMap[slotId];
         return {
           ...prev,
           [activeTarget]: {
             ...targetState,
             assignmentsByFormation: {
               ...targetState.assignmentsByFormation,
-              [targetState.formationId]: currentAssignments,
+              [targetState.formationId]: starterMap,
             },
           },
         };
       });
     };
 
-    // ピッチの配置だけでなく、ベンチも含めた選択中ターゲットの「あなたの26人」全員を削除する
+    // ベンチに割り当てる。assignMemberと対称のロジック（スタメン・ベンチ両方から重複を外してから設定する）。
+    const assignBench = (slotId: string, memberId: string) => {
+      setState((prev) => {
+        const targetState = prev[activeTarget];
+        const starterMap = stripMemberFromMap(
+          targetState.assignmentsByFormation[targetState.formationId] ?? {},
+          memberId,
+        );
+        const benchMap = stripMemberFromMap(
+          targetState.benchAssignmentsByFormation[targetState.formationId] ?? {},
+          memberId,
+        );
+        benchMap[slotId] = memberId;
+        return {
+          ...prev,
+          [activeTarget]: {
+            ...targetState,
+            assignmentsByFormation: {
+              ...targetState.assignmentsByFormation,
+              [targetState.formationId]: starterMap,
+            },
+            benchAssignmentsByFormation: {
+              ...targetState.benchAssignmentsByFormation,
+              [targetState.formationId]: benchMap,
+            },
+          },
+        };
+      });
+    };
+
+    const unassignBench = (slotId: string) => {
+      setState((prev) => {
+        const targetState = prev[activeTarget];
+        const benchMap = {
+          ...(targetState.benchAssignmentsByFormation[targetState.formationId] ?? {}),
+        };
+        delete benchMap[slotId];
+        return {
+          ...prev,
+          [activeTarget]: {
+            ...targetState,
+            benchAssignmentsByFormation: {
+              ...targetState.benchAssignmentsByFormation,
+              [targetState.formationId]: benchMap,
+            },
+          },
+        };
+      });
+    };
+
+    // ピッチの配置（スタメン・ベンチ）だけでなく、選択中ターゲットの「あなたの26人」全員を削除する
     // （もう一方のターゲットの編成には影響しない）
     const clearSquad = () => {
       setState((prev) => ({
         ...prev,
-        [activeTarget]: { ...prev[activeTarget], members: [], assignmentsByFormation: {} },
+        [activeTarget]: {
+          ...prev[activeTarget],
+          members: [],
+          assignmentsByFormation: {},
+          benchAssignmentsByFormation: {},
+        },
       }));
       toast.success("あなたの26人をすべてクリアしました");
     };
@@ -324,6 +412,9 @@ export function SquadProvider({
       assignments: current.assignmentsByFormation[current.formationId] ?? {},
       assignMember,
       unassignSlot,
+      benchAssignments: current.benchAssignmentsByFormation[current.formationId] ?? {},
+      assignBench,
+      unassignBench,
       clearSquad,
       isHydrated,
       target: activeTarget,

@@ -6,6 +6,7 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  pointerWithin,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -28,7 +29,11 @@ import { PlayerPool, POOL_ZONE_ID } from "@/components/formation/player-pool";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import type { Position, RosterMember } from "@/lib/types";
+
+const BENCH_PREFIX = "bench:";
 
 const POSITION_ORDER: Position[] = ["GK", "DF", "MF", "FW"];
 
@@ -42,6 +47,9 @@ export default function MySquadPage() {
     assignments,
     assignMember,
     unassignSlot,
+    benchAssignments,
+    assignBench,
+    unassignBench,
     clearSquad,
     isHydrated,
     target,
@@ -49,6 +57,7 @@ export default function MySquadPage() {
   } = useSquad();
 
   const [activeMember, setActiveMember] = useState<RosterMember | null>(null);
+  const [showBench, setShowBench] = useState(false);
   const pitchRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
@@ -93,13 +102,25 @@ export default function MySquadPage() {
   );
 
   const membersById = Object.fromEntries(members.map((m) => [m.id, m]));
-  const assignedIds = new Set(Object.values(assignments));
+  const assignedIds = new Set([
+    ...Object.values(assignments),
+    ...Object.values(benchAssignments),
+  ]);
   const unassignedMembers = members.filter((m) => !assignedIds.has(m.id));
 
   function handleDragStart(event: DragStartEvent) {
     const data = event.active.data.current as { memberId: string } | undefined;
     if (!data) return;
     setActiveMember(membersById[data.memberId] ?? null);
+  }
+
+  function unassignByOrigin(origin: string) {
+    if (origin === "pool") return;
+    if (origin.startsWith(BENCH_PREFIX)) {
+      unassignBench(origin.slice(BENCH_PREFIX.length));
+      return;
+    }
+    unassignSlot(origin);
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -109,14 +130,19 @@ export default function MySquadPage() {
     if (!data) return;
 
     if (!over) {
-      if (data.origin !== "pool") unassignSlot(data.origin);
+      unassignByOrigin(data.origin);
       return;
     }
     if (over.id === POOL_ZONE_ID) {
-      if (data.origin !== "pool") unassignSlot(data.origin);
+      unassignByOrigin(data.origin);
       return;
     }
-    assignMember(String(over.id), data.memberId);
+    const overId = String(over.id);
+    if (overId.startsWith(BENCH_PREFIX)) {
+      assignBench(overId.slice(BENCH_PREFIX.length), data.memberId);
+      return;
+    }
+    assignMember(overId, data.memberId);
   }
 
   if (!isHydrated) {
@@ -159,6 +185,10 @@ export default function MySquadPage() {
         <>
           <div className="my-squad-page__toolbar">
             <FormationSelect value={formationId} onChange={setFormationId} />
+            <div className="my-squad-page__bench-toggle">
+              <Switch id="show-bench" checked={showBench} onCheckedChange={setShowBench} />
+              <Label htmlFor="show-bench">ベンチも表示</Label>
+            </div>
             <div className="my-squad-page__toolbar-actions">
               <Button variant="outline" className="my-squad-page__action" onClick={handleClearSquad}>
                 <RotateCcw className="my-squad-page__action-icon" />
@@ -176,7 +206,12 @@ export default function MySquadPage() {
             </div>
           </div>
 
-          <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={pointerWithin}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
             <div className="my-squad-page__layout">
               {formation && (
                 <Pitch
@@ -185,6 +220,9 @@ export default function MySquadPage() {
                   assignments={assignments}
                   members={membersById}
                   onRemoveSlot={unassignSlot}
+                  benchAssignments={benchAssignments}
+                  showBench={showBench}
+                  onRemoveBenchSlot={unassignBench}
                 />
               )}
               <PlayerPool members={unassignedMembers} onRemove={removeMember} />

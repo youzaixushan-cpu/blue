@@ -16,4 +16,14 @@
   @include bp(sm) {
     aspect-ratio: 3 / 4;
   }
+
+  // ベンチ表示時は縦に伸ばし、各ラインの絶対的な間隔を広げてベンチチップが
+  // 隣のスロットと衝突しないようにする（座標データ自体はどちらの場合も同じ%のまま）
+  &--with-bench {
+    aspect-ratio: 3 / 5.2;
+
+    @include bp(sm) {
+      aspect-ratio: 3 / 4.8;
+    }
+  }
 }

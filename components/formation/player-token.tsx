@@ -13,7 +13,7 @@ interface PlayerTokenProps {
   player: RosterMember;
   dragId: string;
   origin: "pool" | string;
-  variant: "pitch" | "pool";
+  variant: "pitch" | "pool" | "bench";
   onRemove?: () => void;
 }
 
@@ -26,6 +26,34 @@ export function PlayerToken({ player, dragId, origin, variant, onRemove }: Playe
   const style = transform
     ? { transform: CSS.Translate.toString(transform), zIndex: 50 }
     : undefined;
+
+  if (variant === "bench") {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...listeners}
+        {...attributes}
+        className={cn("player-token", "player-token--bench", isDragging && "player-token--dragging")}
+      >
+        <span className="player-token__bench-label">（{player.name}）</span>
+        {onRemove && (
+          <button
+            type="button"
+            aria-label="ベンチから外す"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            className="player-token__bench-remove"
+          >
+            <X className="player-token__remove-icon" />
+          </button>
+        )}
+      </div>
+    );
+  }
 
   if (variant === "pool") {
     return (
