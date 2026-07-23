@@ -1,7 +1,7 @@
 "use client";
 
 import "./page.scss";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -29,11 +29,10 @@ import { PlayerPool, POOL_ZONE_ID } from "@/components/formation/player-pool";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import type { Position, RosterMember } from "@/lib/types";
 
 const BENCH_PREFIX = "bench:";
+const SHOW_BENCH_STORAGE_KEY = "samurai-squad-show-bench";
 
 const POSITION_ORDER: Position[] = ["GK", "DF", "MF", "FW"];
 
@@ -57,7 +56,17 @@ export default function MySquadPage() {
   } = useSquad();
 
   const [activeMember, setActiveMember] = useState<RosterMember | null>(null);
+  // ページを離れて戻ってきても「控えもフォーメーションに当てはめる」表示が
+  // オフに戻ってしまい、控えに配置した選手が見えなくなってしまうため永続化する
   const [showBench, setShowBench] = useState(false);
+  useEffect(() => {
+    // localStorage（外部システム）からの初回同期のため、マウント時に一度だけ実行
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setShowBench(window.localStorage.getItem(SHOW_BENCH_STORAGE_KEY) === "true");
+  }, []);
+  useEffect(() => {
+    window.localStorage.setItem(SHOW_BENCH_STORAGE_KEY, String(showBench));
+  }, [showBench]);
   const pitchRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
@@ -185,10 +194,6 @@ export default function MySquadPage() {
         <>
           <div className="my-squad-page__toolbar">
             <FormationSelect value={formationId} onChange={setFormationId} />
-            <div className="my-squad-page__bench-toggle">
-              <Switch id="show-bench" checked={showBench} onCheckedChange={setShowBench} />
-              <Label htmlFor="show-bench">ベンチも表示</Label>
-            </div>
             <div className="my-squad-page__toolbar-actions">
               <Button variant="outline" className="my-squad-page__action" onClick={handleClearSquad}>
                 <RotateCcw className="my-squad-page__action-icon" />
@@ -225,7 +230,12 @@ export default function MySquadPage() {
                   onRemoveBenchSlot={unassignBench}
                 />
               )}
-              <PlayerPool members={unassignedMembers} onRemove={removeMember} />
+              <PlayerPool
+                members={unassignedMembers}
+                onRemove={removeMember}
+                showBench={showBench}
+                onShowBenchChange={setShowBench}
+              />
             </div>
 
             <DragOverlay>
