@@ -6,25 +6,62 @@ import { cn } from "@/lib/utils";
 import { PlayerToken } from "@/components/formation/player-token";
 import type { FormationSlot, RosterMember } from "@/lib/types";
 
+export const MAX_BENCH_PER_SLOT = 2;
+
+function BenchSlot({
+  slot,
+  index,
+  member,
+  onRemove,
+}: {
+  slot: FormationSlot;
+  index: number;
+  member?: RosterMember;
+  onRemove: () => void;
+}) {
+  const benchSlotId = `${slot.id}:${index}`;
+  const { setNodeRef, isOver } = useDroppable({ id: `bench:${benchSlotId}` });
+
+  return (
+    <div ref={setNodeRef} className="position-slot__bench-slot">
+      {member ? (
+        <PlayerToken
+          player={member}
+          dragId={`bench:${benchSlotId}`}
+          origin={`bench:${benchSlotId}`}
+          variant="bench"
+          onRemove={onRemove}
+        />
+      ) : (
+        <div
+          className={cn(
+            "position-slot__bench-placeholder",
+            isOver && "position-slot__bench-placeholder--over",
+          )}
+        >
+          控え
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PositionSlot({
   slot,
   member,
-  benchMember,
+  benchMembers,
   showBench,
   onRemove,
   onRemoveBench,
 }: {
   slot: FormationSlot;
   member?: RosterMember;
-  benchMember?: RosterMember;
+  benchMembers: (RosterMember | undefined)[];
   showBench: boolean;
   onRemove: () => void;
-  onRemoveBench: () => void;
+  onRemoveBench: (index: number) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: slot.id });
-  const { setNodeRef: setBenchNodeRef, isOver: isBenchOver } = useDroppable({
-    id: `bench:${slot.id}`,
-  });
 
   return (
     <div
@@ -47,25 +84,16 @@ export function PositionSlot({
       )}
 
       {showBench && (
-        <div ref={setBenchNodeRef} className="position-slot__bench">
-          {benchMember ? (
-            <PlayerToken
-              player={benchMember}
-              dragId={`bench:${slot.id}`}
-              origin={`bench:${slot.id}`}
-              variant="bench"
-              onRemove={onRemoveBench}
+        <div className="position-slot__bench">
+          {Array.from({ length: MAX_BENCH_PER_SLOT }, (_, index) => (
+            <BenchSlot
+              key={index}
+              slot={slot}
+              index={index}
+              member={benchMembers[index]}
+              onRemove={() => onRemoveBench(index)}
             />
-          ) : (
-            <div
-              className={cn(
-                "position-slot__bench-placeholder",
-                isBenchOver && "position-slot__bench-placeholder--over",
-              )}
-            >
-              控え
-            </div>
-          )}
+          ))}
         </div>
       )}
     </div>

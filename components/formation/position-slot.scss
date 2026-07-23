@@ -32,15 +32,26 @@
 
   // スタメンの名前ラベル（player-token__label）の下にさらに重ならないよう配置する。
   // フォーメーションの行間が狭いため、アバターは使わずテキストチップのみで高さを抑える。
+  // 各ポジション最大MAX_BENCH_PER_SLOT人まで、縦に積んで表示する。
   &__bench {
     position: absolute;
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    // 見た目のチップは小さいが、ドロップ/タップの当たり判定はpaddingで広げておく
-    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    // 隣り合う2つのベンチ枠の当たり判定（paddingで広げた分も含む）が重ならないよう、
+    // gapをpaddingの縦方向の合計より大きくしておく（重なるとドロップ先の判定が意図せずズレるため）
+    gap: 0.5rem;
     margin-top: 0.875rem;
     z-index: 1;
+  }
+
+  &__bench-slot {
+    // 見た目のチップは小さいが、ドロップ/タップの当たり判定は横方向だけpaddingで広げておく
+    // （縦方向は隣の枠との当たり判定衝突を避けるため広げない）
+    padding: 0 0.5rem;
   }
 
   &__bench-placeholder {

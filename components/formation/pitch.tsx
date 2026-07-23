@@ -1,5 +1,5 @@
 import "./pitch.scss";
-import { PositionSlot } from "@/components/formation/position-slot";
+import { PositionSlot, MAX_BENCH_PER_SLOT } from "@/components/formation/position-slot";
 import { PitchLines } from "@/components/formation/pitch-lines";
 import { cn } from "@/lib/utils";
 import type { FormationTemplate, RosterMember } from "@/lib/types";
@@ -20,25 +20,30 @@ export function Pitch({
   onRemoveSlot: (slotId: string) => void;
   benchAssignments?: Record<string, string>;
   showBench?: boolean;
-  onRemoveBenchSlot?: (slotId: string) => void;
+  onRemoveBenchSlot?: (benchSlotId: string) => void;
   ref?: React.Ref<HTMLDivElement>;
 }) {
   return (
     <div className={cn("pitch", showBench && "pitch--with-bench")} ref={ref}>
       <PitchLines />
-      {formation.slots.map((slot) => (
-        <PositionSlot
-          key={slot.id}
-          slot={slot}
-          member={assignments[slot.id] ? members[assignments[slot.id]] : undefined}
-          onRemove={() => onRemoveSlot(slot.id)}
-          benchMember={
-            benchAssignments?.[slot.id] ? members[benchAssignments[slot.id]] : undefined
-          }
-          showBench={showBench ?? false}
-          onRemoveBench={() => onRemoveBenchSlot?.(slot.id)}
-        />
-      ))}
+      {formation.slots.map((slot) => {
+        const benchMembers = Array.from({ length: MAX_BENCH_PER_SLOT }, (_, index) => {
+          const memberId = benchAssignments?.[`${slot.id}:${index}`];
+          return memberId ? members[memberId] : undefined;
+        });
+
+        return (
+          <PositionSlot
+            key={slot.id}
+            slot={slot}
+            member={assignments[slot.id] ? members[assignments[slot.id]] : undefined}
+            onRemove={() => onRemoveSlot(slot.id)}
+            benchMembers={benchMembers}
+            showBench={showBench ?? false}
+            onRemoveBench={(index) => onRemoveBenchSlot?.(`${slot.id}:${index}`)}
+          />
+        );
+      })}
     </div>
   );
 }
