@@ -1,6 +1,7 @@
 import "./pitch.scss";
 import { PositionSlot, MAX_BENCH_PER_SLOT } from "@/components/formation/position-slot";
 import { PitchLines } from "@/components/formation/pitch-lines";
+import { PitchFrame } from "@/components/formation/pitch-frame";
 import type { FormationTemplate, RosterMember } from "@/lib/types";
 
 export function Pitch({
@@ -23,26 +24,28 @@ export function Pitch({
   ref?: React.Ref<HTMLDivElement>;
 }) {
   return (
-    <div className="pitch" ref={ref}>
-      <PitchLines />
-      {formation.slots.map((slot) => {
-        const benchMembers = Array.from({ length: MAX_BENCH_PER_SLOT }, (_, index) => {
-          const memberId = benchAssignments?.[`${slot.id}:${index}`];
-          return memberId ? members[memberId] : undefined;
-        });
+    <PitchFrame ref={ref}>
+      <div className="pitch">
+        <PitchLines />
+        {formation.slots.map((slot) => {
+          const benchMembers = Array.from({ length: MAX_BENCH_PER_SLOT }, (_, index) => {
+            const memberId = benchAssignments?.[`${slot.id}:${index}`];
+            return memberId ? members[memberId] : undefined;
+          });
 
-        return (
-          <PositionSlot
-            key={slot.id}
-            slot={slot}
-            member={assignments[slot.id] ? members[assignments[slot.id]] : undefined}
-            onRemove={() => onRemoveSlot(slot.id)}
-            benchMembers={benchMembers}
-            showBench={showBench ?? false}
-            onRemoveBench={(index) => onRemoveBenchSlot?.(`${slot.id}:${index}`)}
-          />
-        );
-      })}
-    </div>
+          return (
+            <PositionSlot
+              key={slot.id}
+              slot={slot}
+              member={assignments[slot.id] ? members[assignments[slot.id]] : undefined}
+              onRemove={() => onRemoveSlot(slot.id)}
+              benchMembers={benchMembers}
+              showBench={showBench ?? false}
+              onRemoveBench={(index) => onRemoveBenchSlot?.(`${slot.id}:${index}`)}
+            />
+          );
+        })}
+      </div>
+    </PitchFrame>
   );
 }

@@ -5,6 +5,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { X } from "lucide-react";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
+import { PitchPlayerMarker } from "@/components/formation/pitch-player-marker";
 import { PositionBadge } from "@/components/players/position-badge";
 import { cn } from "@/lib/utils";
 import type { RosterMember } from "@/lib/types";
@@ -95,12 +96,7 @@ export function PlayerToken({ player, dragId, origin, variant, onRemove }: Playe
       className={cn("player-token", "player-token--pitch", isDragging && "player-token--dragging")}
     >
       <div {...listeners} {...attributes} className="player-token__handle">
-        <PlayerAvatar
-          label={player.nameEn}
-          theme={player.avatarTheme}
-          size="md"
-          className="player-token__avatar"
-        />
+        <PitchPlayerMarker seed={player.nameEn} theme={player.avatarTheme} size="md" />
       </div>
       {onRemove && (
         <button

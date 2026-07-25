@@ -1,6 +1,7 @@
 import "./squad-detail-pitch.scss";
 import { PitchLines } from "@/components/formation/pitch-lines";
-import { PlayerAvatar } from "@/components/shared/player-avatar";
+import { PitchFrame } from "@/components/formation/pitch-frame";
+import { PitchPlayerMarker } from "@/components/formation/pitch-player-marker";
 import type { FormationTemplate, Player, Position } from "@/lib/types";
 
 export interface SquadDetailMember {
@@ -22,30 +23,30 @@ export function SquadDetailPitch({
   const memberBySlot = Object.fromEntries(members.map((m) => [m.slotId, m]));
 
   return (
-    <div className="squad-detail-pitch">
-      <PitchLines />
-      {formation.slots.map((slot) => {
-        const member = memberBySlot[slot.id];
-        if (!member) return null;
-        const player = member.playerId ? players[member.playerId] : undefined;
+    <PitchFrame>
+      <div className="squad-detail-pitch">
+        <PitchLines />
+        {formation.slots.map((slot) => {
+          const member = memberBySlot[slot.id];
+          if (!member) return null;
+          const player = member.playerId ? players[member.playerId] : undefined;
 
-        return (
-          <div
-            key={slot.id}
-            style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
-            className="squad-detail-pitch__slot"
-          >
-            <PlayerAvatar
-              label={player?.nameEn ?? member.name}
-              seed={player ? undefined : member.name}
-              theme={player?.avatarTheme}
-              size="sm"
-              className="squad-detail-pitch__avatar"
-            />
-            <span className="squad-detail-pitch__name">{member.name}</span>
-          </div>
-        );
-      })}
-    </div>
+          return (
+            <div
+              key={slot.id}
+              style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+              className="squad-detail-pitch__slot"
+            >
+              <PitchPlayerMarker
+                seed={player?.nameEn ?? member.name}
+                theme={player?.avatarTheme}
+                size="sm"
+              />
+              <span className="squad-detail-pitch__name">{member.name}</span>
+            </div>
+          );
+        })}
+      </div>
+    </PitchFrame>
   );
 }
