@@ -121,8 +121,6 @@
   &--bench {
     position: relative;
     display: inline-flex;
-    align-items: center;
-    gap: 0.125rem;
     cursor: grab;
 
     &:active {
@@ -141,7 +139,15 @@
     text-shadow: 0 1px 2px rgb(0 0 0 / 70%);
   }
 
+  // labelの幅だけでトークンの中心が決まるよう、ボタンは絶対配置にして
+  // レイアウト幅に影響させない（レイアウトに含めると、スタメン側と違って
+  // 見た目の中心がボタン分だけ左にずれてしまうため）。
   &__bench-remove {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    margin-left: 0.125rem;
     display: flex;
     flex-shrink: 0;
     align-items: center;
