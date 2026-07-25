@@ -1,4 +1,4 @@
-const USER_AGENT = "SamuraiBlueFanHub/1.0 (https://github.com/youzaixushan-cpu/blue; fan site, non-commercial)";
+const USER_AGENT = "BlueScout/1.0 (https://github.com/youzaixushan-cpu/blue; fan site, non-commercial)";
 const BIRTH_DATE_PROPERTY = "P569";
 const MEMBER_OF_SPORTS_TEAM_PROPERTY = "P54";
 const START_TIME_QUALIFIER = "P580";

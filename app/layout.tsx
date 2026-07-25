@@ -25,8 +25,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: "SAMURAI BLUE FAN HUB",
-    template: "%s | SAMURAI BLUE FAN HUB",
+    default: "BlueScout",
+    template: "%s | BlueScout",
   },
   description:
     "日本代表ファンのための非公式ファンサイト。選手情報・試合結果・あなたの26人・AI代表予想・みんなの代表を発信しています。",

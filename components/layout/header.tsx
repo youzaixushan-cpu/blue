@@ -16,7 +16,7 @@ export function Header() {
     <header className="header">
       <div className="header__inner">
         <Link href="/" className="header__brand">
-          <span className="header__brand-name">SAMURAI BLUE FAN HUB</span>
+          <span className="header__brand-name">BlueScout</span>
         </Link>
 
         <nav className="header__nav">
