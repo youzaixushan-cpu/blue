@@ -31,12 +31,7 @@ export function BestXiPitch({
               style={{ left: `${pick.x}%`, top: `${pick.y}%` }}
               className="best-xi-pitch__slot"
             >
-              <PitchPlayerMarker
-                seed={player.nameEn}
-                theme={player.avatarTheme}
-                size="md"
-                haloClassName={haloForConfidence(pick.confidence)}
-              />
+              <PitchPlayerMarker size="md" haloClassName={haloForConfidence(pick.confidence)} />
               <span className="best-xi-pitch__name">{player.name}</span>
             </div>
           );

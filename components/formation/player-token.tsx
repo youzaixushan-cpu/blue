@@ -96,7 +96,7 @@ export function PlayerToken({ player, dragId, origin, variant, onRemove }: Playe
       className={cn("player-token", "player-token--pitch", isDragging && "player-token--dragging")}
     >
       <div {...listeners} {...attributes} className="player-token__handle">
-        <PitchPlayerMarker seed={player.nameEn} theme={player.avatarTheme} size="md" />
+        <PitchPlayerMarker size="md" />
       </div>
       {onRemove && (
         <button

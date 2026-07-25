@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getCommunitySquadDetail } from "@/lib/db/community";
 import { getFormationById } from "@/lib/data/formations";
-import { getAllPlayers } from "@/lib/db/players";
 import { squadTargetShortLabel } from "@/lib/squad-target";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
 import { Badge } from "@/components/ui/badge";
@@ -41,9 +40,6 @@ export default async function CommunitySquadDetailPage({
   const formation = getFormationById(detail.formationId);
   if (!formation) notFound();
 
-  const players = await getAllPlayers();
-  const playersById = Object.fromEntries(players.map((p) => [p.id, p]));
-
   return (
     <div className="squad-detail-page">
       <Link href="/community" className="squad-detail-page__back">
@@ -71,7 +67,7 @@ export default async function CommunitySquadDetailPage({
 
       <h1 className="squad-detail-page__title">{detail.title}</h1>
 
-      <SquadDetailPitch formation={formation} members={detail.members} players={playersById} />
+      <SquadDetailPitch formation={formation} members={detail.members} />
 
       <LikeButton
         submissionId={detail.id}
