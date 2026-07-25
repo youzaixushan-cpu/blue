@@ -66,6 +66,17 @@
     letter-spacing: -0.01em;
   }
 
+  &__comment {
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    background-color: var(--card);
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--muted-foreground);
+    white-space: pre-wrap;
+  }
+
   &__like {
     display: flex;
     align-items: center;

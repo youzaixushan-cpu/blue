@@ -56,6 +56,8 @@ model CommunitySubmission {
   formationId String
   authorName  String
   title       String
+  // 布陣のポイントや狙いを書ける任意のコメント
+  comment     String?
   likes       Int                         @default(0)
   createdAt   DateTime                    @default(now())
   // 投稿元のIPをハッシュ化した値（レート制限用。生IPは保存しない）

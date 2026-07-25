@@ -8,6 +8,7 @@ export interface CommunitySquadDetail {
   id: string;
   authorName: string;
   title: string;
+  comment: string | null;
   formationId: string;
   formationName: string;
   likes: number;
@@ -27,6 +28,7 @@ export interface SubmitSquadInput {
   formationId: string;
   authorName?: string;
   title?: string;
+  comment?: string;
   members: SubmitSquadMemberInput[];
   ipHash: string;
   target: SquadTarget;
@@ -64,12 +66,14 @@ export async function submitSquad(input: SubmitSquadInput): Promise<string> {
 
   const authorName = (input.authorName?.trim() || "匿名サポーター").slice(0, 40);
   const title = (input.title?.trim() || `${formation.name}の予想布陣`).slice(0, 80);
+  const comment = input.comment?.trim().slice(0, 200) || null;
 
   const submission = await prisma.communitySubmission.create({
     data: {
       formationId: input.formationId,
       authorName,
       title,
+      comment,
       ipHash: input.ipHash,
       target: input.target,
       members: {
@@ -247,6 +251,7 @@ export async function getCommunitySquadDetail(id: string): Promise<CommunitySqua
     id: submission.id,
     authorName: submission.authorName,
     title: submission.title,
+    comment: submission.comment,
     formationId: submission.formationId,
     formationName: formation?.name ?? submission.formationId,
     likes: submission.likes,

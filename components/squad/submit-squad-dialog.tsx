@@ -10,6 +10,7 @@ import { squadTargetShortLabel } from "@/lib/squad-target";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,7 @@ export function SubmitSquadDialog() {
   const [open, setOpen] = useState(false);
   const [authorName, setAuthorName] = useState("");
   const [title, setTitle] = useState("");
+  const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const formation = getFormationById(formationId);
@@ -56,7 +58,7 @@ export function SubmitSquadDialog() {
       const res = await fetch("/api/community/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ formationId, authorName, title, members: payloadMembers, target }),
+        body: JSON.stringify({ formationId, authorName, title, comment, members: payloadMembers, target }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -66,6 +68,7 @@ export function SubmitSquadDialog() {
       setOpen(false);
       setAuthorName("");
       setTitle("");
+      setComment("");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "投稿に失敗しました");
     } finally {
@@ -107,6 +110,17 @@ export function SubmitSquadDialog() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder={formation ? `${formation.name}の予想布陣` : ""}
               maxLength={80}
+            />
+          </div>
+          <div className="submit-squad-dialog__field">
+            <Label htmlFor="submit-squad-comment">コメント（任意）</Label>
+            <Textarea
+              id="submit-squad-comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="この布陣のポイントや狙いなど"
+              maxLength={200}
+              rows={3}
             />
           </div>
           <DialogFooter>

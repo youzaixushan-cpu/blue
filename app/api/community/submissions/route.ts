@@ -12,6 +12,7 @@ interface SubmitSquadRequestBody {
   formationId?: unknown;
   authorName?: unknown;
   title?: unknown;
+  comment?: unknown;
   members?: unknown;
   target?: unknown;
 }
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
       formationId: body.formationId,
       authorName: typeof body.authorName === "string" ? body.authorName : undefined,
       title: typeof body.title === "string" ? body.title : undefined,
+      comment: typeof body.comment === "string" ? body.comment : undefined,
       members: body.members,
       ipHash,
       target: body.target,

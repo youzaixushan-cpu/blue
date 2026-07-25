@@ -67,6 +67,8 @@ export default async function CommunitySquadDetailPage({
 
       <h1 className="squad-detail-page__title">{detail.title}</h1>
 
+      {detail.comment && <p className="squad-detail-page__comment">{detail.comment}</p>}
+
       <SquadDetailPitch formation={formation} members={detail.members} />
 
       <LikeButton
