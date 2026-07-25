@@ -1,7 +1,6 @@
 import "./pitch.scss";
 import { PositionSlot, MAX_BENCH_PER_SLOT } from "@/components/formation/position-slot";
 import { PitchLines } from "@/components/formation/pitch-lines";
-import { cn } from "@/lib/utils";
 import type { FormationTemplate, RosterMember } from "@/lib/types";
 
 export function Pitch({
@@ -24,7 +23,7 @@ export function Pitch({
   ref?: React.Ref<HTMLDivElement>;
 }) {
   return (
-    <div className={cn("pitch", showBench && "pitch--with-bench")} ref={ref}>
+    <div className="pitch" ref={ref}>
       <PitchLines />
       {formation.slots.map((slot) => {
         const benchMembers = Array.from({ length: MAX_BENCH_PER_SLOT }, (_, index) => {
