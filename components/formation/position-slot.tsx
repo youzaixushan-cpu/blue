@@ -63,6 +63,12 @@ export function PositionSlot({
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: slot.id });
 
+  // 控え枠は基本1人分だけ表示し、埋まったら次の1人分だけ追加で表示する
+  // （最初から2人分の空き枠を出しっぱなしにすると、26人登録してもスカスカに
+  // 見えてしまうため。上限のMAX_BENCH_PER_SLOTまでは埋まった数+1枠を出す）。
+  const filledBenchCount = benchMembers.filter(Boolean).length;
+  const benchSlotsToShow = Math.min(filledBenchCount + 1, MAX_BENCH_PER_SLOT);
+
   return (
     <div
       ref={setNodeRef}
@@ -84,8 +90,8 @@ export function PositionSlot({
       )}
 
       {showBench && (
-        <div className="position-slot__bench">
-          {Array.from({ length: MAX_BENCH_PER_SLOT }, (_, index) => (
+        <div className={cn("position-slot__bench", member && "position-slot__bench--with-starter")}>
+          {Array.from({ length: benchSlotsToShow }, (_, index) => (
             <BenchSlot
               key={index}
               slot={slot}

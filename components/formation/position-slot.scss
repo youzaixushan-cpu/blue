@@ -46,6 +46,13 @@
     gap: 0.5rem;
     margin-top: 0.875rem;
     z-index: 1;
+
+    // スタメンが配置されている場合、マーカーの真下にはスタメンの名前ラベル
+    // （player-token__label）がさらに絶対配置で乗っているため、そのぶん
+    // 下にずらして重ならないようにする。
+    &--with-starter {
+      margin-top: 2rem;
+    }
   }
 
   &__bench-slot {
