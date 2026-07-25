@@ -21,22 +21,6 @@
     transform: translate(-50%, -50%);
   }
 
-  // 青の濃淡だけで信頼度の高低を表す統一感のあるスケール（マーカー背後のhalo色）
-  &__halo {
-    &--high {
-      color: #1e40af;
-    }
-    &--good {
-      color: #3b82f6;
-    }
-    &--fair {
-      color: #93c5fd;
-    }
-    &--low {
-      color: rgb(255 255 255 / 50%);
-    }
-  }
-
   &__name {
     position: absolute;
     top: 100%;

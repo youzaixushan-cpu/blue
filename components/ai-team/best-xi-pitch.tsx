@@ -4,13 +4,6 @@ import { PitchFrame } from "@/components/formation/pitch-frame";
 import { PitchPlayerMarker } from "@/components/formation/pitch-player-marker";
 import type { AiPrediction, Player } from "@/lib/types";
 
-function haloForConfidence(confidence: number) {
-  if (confidence >= 90) return "best-xi-pitch__halo--high";
-  if (confidence >= 80) return "best-xi-pitch__halo--good";
-  if (confidence >= 70) return "best-xi-pitch__halo--fair";
-  return "best-xi-pitch__halo--low";
-}
-
 export function BestXiPitch({
   prediction,
   players,
@@ -31,7 +24,7 @@ export function BestXiPitch({
               style={{ left: `${pick.x}%`, top: `${pick.y}%` }}
               className="best-xi-pitch__slot"
             >
-              <PitchPlayerMarker size="md" haloClassName={haloForConfidence(pick.confidence)} />
+              <PitchPlayerMarker size="md" />
               <span className="best-xi-pitch__name">{player.name}</span>
             </div>
           );
