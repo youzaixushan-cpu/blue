@@ -11,10 +11,21 @@
 
   &__panel {
     @include card-surface;
+    position: relative;
+    overflow: hidden;
     padding: 1.5rem;
 
     @include bp(sm) {
       padding: 2rem;
+    }
+
+    // 平坦になりがちなカード上端に、サイトの青系アクセントで一本ラインを入れる
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary) 0%, #60a5fa 50%, var(--primary) 100%);
     }
   }
 
@@ -25,12 +36,13 @@
   }
 
   &__value {
-    font-size: 1.5rem;
-    font-weight: 900;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 400;
+    letter-spacing: 0;
 
     @include bp(sm) {
-      font-size: 1.875rem;
+      font-size: 2.125rem;
     }
   }
 

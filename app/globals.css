@@ -53,6 +53,10 @@
 :root {
   --font-sans: var(--font-geist-sans), "Hiragino Sans", "Hiragino Kaku Gothic ProN",
     "Yu Gothic", "Noto Sans JP", system-ui, sans-serif;
+  /* 太く角ばった見出し用書体（Anton、和文グリフ非対応のためGeist Sansへフォールバック）。
+     まずホームページの見出し・数字にのみ適用する試験導入のため、
+     全体の--font-headingトークンには接続しない。 */
+  --font-display: var(--font-anton), var(--font-sans);
   --background: oklch(0.16 0.03 262);
   --foreground: oklch(0.96 0.008 260);
   --card: oklch(0.2 0.035 262);

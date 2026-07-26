@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Anton } from "next/font/google";
 import "./globals.css";
 import "./layout.scss";
 import { SessionProvider } from "next-auth/react";
@@ -22,6 +22,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// ホームページの見出し・数字用の太く角ばった見出し書体（まずホームだけの試験導入）。
+// 和文グリフは持たないため、CSS側でGeist Sansへのフォールバックを必ず併記する。
+const anton = Anton({
+  variable: "--font-anton",
+  weight: "400",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
@@ -40,7 +48,10 @@ export default async function RootLayout({
   const [players, session] = await Promise.all([getAllPlayers(), auth()]);
 
   return (
-    <html lang="ja" className={`${geistSans.variable} ${geistMono.variable} app-shell`}>
+    <html
+      lang="ja"
+      className={`${geistSans.variable} ${geistMono.variable} ${anton.variable} app-shell`}
+    >
       <body className="app-shell__body">
         <SessionProvider session={session}>
           <SquadProvider players={players}>
