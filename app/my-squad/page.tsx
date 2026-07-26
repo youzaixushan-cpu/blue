@@ -23,7 +23,6 @@ import { GuestNotice } from "@/components/auth/guest-notice";
 import { SquadSummaryBar } from "@/components/squad/squad-summary-bar";
 import { AddMemberForm } from "@/components/squad/add-member-form";
 import { SubmitSquadDialog } from "@/components/squad/submit-squad-dialog";
-import { SquadComparisonPanel } from "@/components/squad/squad-comparison-panel";
 import { FormationSelect } from "@/components/formation/formation-select";
 import { Pitch } from "@/components/formation/pitch";
 import { PlayerPool, POOL_ZONE_ID } from "@/components/formation/player-pool";
@@ -39,7 +38,6 @@ const POSITION_ORDER: Position[] = ["GK", "DF", "MF", "FW"];
 
 export default function MySquadPage() {
   const {
-    players,
     members,
     addMember,
     removeMember,
@@ -256,8 +254,6 @@ export default function MySquadPage() {
           </DndContext>
         </>
       )}
-
-      {target === "next" && <SquadComparisonPanel members={members} players={players} />}
     </div>
   );
 }
