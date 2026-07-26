@@ -22,8 +22,9 @@
     flex-shrink: 0;
     width: 1.5rem;
     text-align: center;
-    font-size: 1.125rem;
-    font-weight: 900;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 400;
     font-variant-numeric: tabular-nums;
     color: var(--muted-foreground);
   }
@@ -66,8 +67,9 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 400;
     font-variant-numeric: tabular-nums;
   }
 

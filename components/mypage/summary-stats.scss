@@ -31,8 +31,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 1.125rem;
-    font-weight: 900;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 400;
   }
 
   &__label {

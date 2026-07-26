@@ -35,8 +35,9 @@
     flex-shrink: 0;
     width: 2.5rem;
     text-align: right;
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 400;
     font-variant-numeric: tabular-nums;
   }
 }
