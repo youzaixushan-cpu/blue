@@ -11,4 +11,39 @@
   @include bp(lg) {
     padding: 2.5rem 2rem;
   }
+
+  &__results-card {
+    @include card-surface;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.25rem 1.5rem;
+
+    @include bp(sm) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  &__results-title {
+    font-weight: 600;
+  }
+
+  &__results-hint {
+    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+  }
+
+  &__results-action {
+    flex-shrink: 0;
+    border-radius: 9999px;
+  }
+
+  &__results-action-icon {
+    width: 1rem;
+    height: 1rem;
+  }
 }

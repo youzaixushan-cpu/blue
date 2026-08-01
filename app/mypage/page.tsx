@@ -2,6 +2,7 @@
 
 import "./page.scss";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useSquad } from "@/lib/squad-context";
 import { getFormationById } from "@/lib/data/formations";
@@ -58,6 +59,22 @@ export default function MyPage() {
         formationName={formation?.name ?? "-"}
         targetLabel={squadTargetShortLabel(target)}
       />
+
+      <div className="mypage-page__results-card">
+        <div>
+          <p className="mypage-page__results-title">次回の試合の結果を確認</p>
+          <p className="mypage-page__results-hint">
+            公式発表メンバーとの一致率・的中選手をチェックできます。
+          </p>
+        </div>
+        <Button asChild className="mypage-page__results-action">
+          <Link href="/mypage/results">
+            結果を見る
+            <ArrowRight className="mypage-page__results-action-icon" />
+          </Link>
+        </Button>
+      </div>
+
       <SettingsList />
     </div>
   );
