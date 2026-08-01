@@ -13,6 +13,10 @@
     margin-bottom: 2rem;
   }
 
+  &__view-tabs {
+    margin-top: 1.5rem;
+  }
+
   &__add {
     @include card-surface;
     margin-top: 1.5rem;
@@ -23,6 +27,17 @@
     margin-top: 1.5rem;
     font-size: 0.875rem;
     color: var(--muted-foreground);
+  }
+
+  &__empty-link {
+    border: none;
+    background: none;
+    padding: 0;
+    font: inherit;
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    cursor: pointer;
   }
 
   &__roster {
@@ -90,5 +105,68 @@
     display: flex;
     justify-content: center;
     margin-top: 2rem;
+  }
+
+  &__toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+
+    @include bp(sm) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  &__toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &__action {
+    border-radius: 9999px;
+  }
+
+  &__action-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &__layout {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1.5rem;
+
+    @include bp(lg) {
+      grid-template-columns: 1fr 20rem;
+    }
+  }
+
+  &__drag-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &__drag-avatar {
+    box-shadow: 0 16px 32px -12px rgb(0 0 0 / 45%);
+    border: 2px solid #fff;
+  }
+
+  &__drag-name {
+    max-width: 5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: 9999px;
+    background-color: rgb(0 0 0 / 60%);
+    padding: 0.125rem 0.5rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: #fff;
   }
 }
