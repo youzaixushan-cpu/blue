@@ -1,7 +1,7 @@
 export type SquadTarget = "next" | "2030";
 
 export const SQUAD_TARGETS: { value: SquadTarget; label: string; shortLabel: string }[] = [
-  { value: "next", label: "次回選考（直近の代表招集）", shortLabel: "次回選考" },
+  { value: "next", label: "次回の試合（直近の代表招集）", shortLabel: "次回の試合" },
   { value: "2030", label: "2030年 FIFAワールドカップ", shortLabel: "2030年W杯" },
 ];
 

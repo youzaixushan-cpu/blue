@@ -76,6 +76,9 @@ interface SquadContextValue {
   isHydrated: boolean;
   target: SquadTarget;
   setTarget: (target: SquadTarget) => void;
+  // 現在アクティブなタブに関係なく、特定のターゲットのメンバーを読みたい場面
+  // （AI代表との比較、マイページの照合結果など）向けの参照専用データ
+  membersByTarget: Record<SquadTarget, RosterMember[]>;
 }
 
 const SquadContext = createContext<SquadContextValue | null>(null);
@@ -419,6 +422,7 @@ export function SquadProvider({
       isHydrated,
       target: activeTarget,
       setTarget: setActiveTarget,
+      membersByTarget: { next: state.next.members, "2030": state["2030"].members },
     };
   }, [state, activeTarget, isHydrated, players]);
 
