@@ -1,6 +1,5 @@
 import type { Player, Position, RosterMember } from "@/lib/types";
 import type { AvatarThemeKey } from "@/lib/avatar";
-import { SQUAD_MAX_SIZE } from "@/lib/squad-context";
 
 export type MatchStatus = "hit" | "predicted-miss" | "surprise";
 
@@ -19,7 +18,7 @@ export interface SurpriseSelection {
 }
 
 export interface SquadComparisonResult {
-  matchRate: number; // 0-100、常にhitCount / SQUAD_MAX_SIZE（26）で計算
+  matchRate: number; // 0-100、常にhitCount / targetPlayerIds.length で計算
   hitCount: number;
   comparedMembers: ComparedMember[]; // membersと同じ順序・件数
   surpriseSelections: SurpriseSelection[];
@@ -32,10 +31,10 @@ export function normalizePlayerName(raw: string): string {
 
 export function compareSquad(
   members: RosterMember[],
-  officialSquadPlayerIds: readonly string[],
+  targetPlayerIds: readonly string[],
   players: Player[],
 ): SquadComparisonResult {
-  const officialIdSet = new Set(officialSquadPlayerIds);
+  const officialIdSet = new Set(targetPlayerIds);
   const officialPlayers = players.filter((p) => officialIdSet.has(p.id));
   const officialNameSet = new Set(officialPlayers.map((p) => normalizePlayerName(p.name)));
 
@@ -54,7 +53,10 @@ export function compareSquad(
   });
 
   const hitCount = comparedMembers.filter((c) => c.status === "hit").length;
-  const matchRate = Math.min(100, Math.round((hitCount / SQUAD_MAX_SIZE) * 100));
+  const matchRate =
+    targetPlayerIds.length === 0
+      ? 0
+      : Math.min(100, Math.round((hitCount / targetPlayerIds.length) * 100));
 
   const surpriseSelections: SurpriseSelection[] = officialPlayers
     .filter(

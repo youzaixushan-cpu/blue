@@ -1,5 +1,7 @@
 import "./page.scss";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Scale } from "lucide-react";
 import { getAllPlayers } from "@/lib/db/players";
 import { aiPredictions } from "@/lib/data/ai-team";
 import { DEFAULT_SQUAD_TARGET, isSquadTarget } from "@/lib/squad-target";
@@ -7,6 +9,7 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { TargetLinkTabs } from "@/components/shared/target-link-tabs";
 import { BestXiPitch } from "@/components/ai-team/best-xi-pitch";
 import { PickList } from "@/components/ai-team/pick-list";
+import { Button } from "@/components/ui/button";
 
 // DB管理データのため、ビルド時に静的化せず常に最新の内容を表示する
 export const dynamic = "force-dynamic";
@@ -51,6 +54,13 @@ export default async function AiTeamPage({ searchParams }: AiTeamPageProps) {
         {prediction.formationName}
       </p>
       <p className="ai-team-page__source">{prediction.source}</p>
+
+      <Button asChild variant="outline" className="ai-team-page__compare">
+        <Link href={`/ai-team/compare?target=${target}`}>
+          <Scale className="ai-team-page__compare-icon" />
+          自分の予想と比較
+        </Link>
+      </Button>
 
       <div className="ai-team-page__layout">
         <BestXiPitch prediction={prediction} players={playersById} />
