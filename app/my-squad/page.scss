@@ -13,6 +13,34 @@
     margin-bottom: 2rem;
   }
 
+  // 「次回の試合/2030年W杯」「メンバー選考/フォーメーション」の2つのタブ切り替えを、
+  // shadcnの標準サイズ（h-8・薄い配色）よりも大きく・目立つ配色にする。
+  // player-filter-bar.tsx等、他のTabs利用箇所には影響させたくないため、
+  // components/ui/tabs.tsx自体は変更せずここでスコープして上書きする。
+  &__mode-tabs,
+  &__view-tabs {
+    [data-slot="tabs-list"] {
+      height: auto;
+      gap: 0.25rem;
+      border-radius: 9999px;
+      padding: 0.25rem;
+    }
+
+    [data-slot="tabs-trigger"] {
+      height: auto;
+      border-radius: 9999px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.9375rem;
+      font-weight: 700;
+
+      &[data-state="active"] {
+        background-color: var(--primary);
+        color: var(--primary-foreground);
+        box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+      }
+    }
+  }
+
   &__view-tabs {
     margin-top: 1.5rem;
   }

@@ -171,7 +171,11 @@ export default function MySquadPage() {
         title="あなたの26人"
         description="登録選手に関係なく、あなたの予想を自由に追加できます。「メンバー選考」でメンバーを追加し、「フォーメーション」でピッチに配置しましょう。"
         action={
-          <Tabs value={target} onValueChange={(v) => setTarget(v as SquadTarget)}>
+          <Tabs
+            value={target}
+            onValueChange={(v) => setTarget(v as SquadTarget)}
+            className="my-squad-page__mode-tabs"
+          >
             <TabsList>
               {SQUAD_TARGETS.map((t) => (
                 <TabsTrigger key={t.value} value={t.value}>
