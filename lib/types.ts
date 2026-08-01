@@ -1,4 +1,5 @@
 import type { AvatarThemeKey } from "@/lib/avatar";
+import type { SquadTarget } from "@/lib/squad-target";
 
 export type Position = "GK" | "DF" | "MF" | "FW";
 
@@ -94,6 +95,7 @@ export interface CommunitySquad {
   authorName: string;
   authorAvatarSeed: string;
   formationName: string;
+  target: SquadTarget;
   title: string;
   likes: number;
   createdAt: string;

@@ -44,6 +44,14 @@
     color: var(--muted-foreground);
   }
 
+  &__badges {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  &__target,
   &__formation {
     border-radius: 9999px;
   }

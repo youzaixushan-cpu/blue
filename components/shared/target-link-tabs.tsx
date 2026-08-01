@@ -4,18 +4,32 @@ import { cn } from "@/lib/utils";
 import { SQUAD_TARGETS, type SquadTarget } from "@/lib/squad-target";
 
 interface TargetLinkTabsProps {
-  active: SquadTarget;
+  active: SquadTarget | undefined;
   basePath: string;
+  // trueの時だけ先頭に、クエリパラメータ無し（target未指定＝すべて）へのピルを追加する
+  showAllOption?: boolean;
   className?: string;
 }
 
-export function TargetLinkTabs({ active, basePath, className }: TargetLinkTabsProps) {
+export function TargetLinkTabs({ active, basePath, showAllOption, className }: TargetLinkTabsProps) {
   return (
     <div className={cn("target-link-tabs", className)}>
+      {showAllOption && (
+        <Link
+          href={basePath}
+          className={cn(
+            "target-link-tabs__item",
+            active === undefined && "target-link-tabs__item--active",
+          )}
+          aria-current={active === undefined ? "page" : undefined}
+        >
+          すべて
+        </Link>
+      )}
       {SQUAD_TARGETS.map((t) => (
         <Link
           key={t.value}
-          href={t.value === "next" ? basePath : `${basePath}?target=${t.value}`}
+          href={`${basePath}?target=${t.value}`}
           className={cn(
             "target-link-tabs__item",
             active === t.value && "target-link-tabs__item--active",

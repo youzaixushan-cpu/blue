@@ -109,13 +109,17 @@ export async function likeSubmission(id: string, ipHash: string): Promise<number
 
 // 「上昇/下降/変化なし」は前回このランキングを計算した時点の順位（PlayerRankStat、target別）との比較で決まる。
 // 呼び出すたびに現在の順位を新しい基準値として保存し直すため、「前回表示時からの変化」を表す。
-export async function getPlayerRankings(target: SquadTarget): Promise<PlayerRanking[]> {
-  const totalSubmissions = await prisma.communitySubmission.count({ where: { target } });
+// target未指定（=すべて）の場合はtarget横断で集計する。その場合、順位変化の基準値保存はスキップする
+// （「すべて」に対応するPlayerRankStat行を持たないため、target別の基準値を巻き込んで壊さないようにする）。
+export async function getPlayerRankings(target?: SquadTarget): Promise<PlayerRanking[]> {
+  const totalSubmissions = await prisma.communitySubmission.count({
+    where: target ? { target } : undefined,
+  });
   if (totalSubmissions === 0) return [];
 
   const grouped = await prisma.communitySubmissionMember.groupBy({
     by: ["playerId"],
-    where: { playerId: { not: null }, submission: { target } },
+    where: { playerId: { not: null }, submission: target ? { target } : undefined },
     _count: { _all: true },
   });
 
@@ -131,9 +135,12 @@ export async function getPlayerRankings(target: SquadTarget): Promise<PlayerRank
 
   if (ranked.length === 0) return [];
 
-  const stats = await prisma.playerRankStat.findMany({
-    where: { target, playerId: { in: ranked.map((r) => r.playerId) } },
-  });
+  // 「すべて」（target未指定）には基準値の保存先が無いため、順位変化は常に「変化なし」として扱う
+  const stats = target
+    ? await prisma.playerRankStat.findMany({
+        where: { target, playerId: { in: ranked.map((r) => r.playerId) } },
+      })
+    : [];
   const lastRankByPlayer = new Map(stats.map((s) => [s.playerId, s.lastRank]));
 
   const result: PlayerRanking[] = ranked.map((r) => {
@@ -146,26 +153,29 @@ export async function getPlayerRankings(target: SquadTarget): Promise<PlayerRank
     return { playerId: r.playerId, selectionRate: r.selectionRate, rank: r.rank, trend };
   });
 
-  await Promise.all(
-    ranked.map((r) =>
-      prisma.playerRankStat.upsert({
-        where: { playerId_target: { playerId: r.playerId, target } },
-        update: { lastRank: r.rank },
-        create: { playerId: r.playerId, target, lastRank: r.rank },
-      }),
-    ),
-  );
+  // 「すべて」（target未指定）には対応する基準値の保存先が無いため、target別の時だけ更新する
+  if (target) {
+    await Promise.all(
+      ranked.map((r) =>
+        prisma.playerRankStat.upsert({
+          where: { playerId_target: { playerId: r.playerId, target } },
+          update: { lastRank: r.rank },
+          create: { playerId: r.playerId, target, lastRank: r.rank },
+        }),
+      ),
+    );
+  }
 
   return result;
 }
 
-export async function getFormationRankings(target: SquadTarget): Promise<FormationRanking[]> {
-  const total = await prisma.communitySubmission.count({ where: { target } });
+export async function getFormationRankings(target?: SquadTarget): Promise<FormationRanking[]> {
+  const total = await prisma.communitySubmission.count({ where: target ? { target } : undefined });
   if (total === 0) return [];
 
   const grouped = await prisma.communitySubmission.groupBy({
     by: ["formationId"],
-    where: { target },
+    where: target ? { target } : undefined,
     _count: { _all: true },
   });
 
@@ -180,9 +190,9 @@ export async function getFormationRankings(target: SquadTarget): Promise<Formati
     }));
 }
 
-export async function getCommunitySquads(target: SquadTarget, limit = 12): Promise<CommunitySquad[]> {
+export async function getCommunitySquads(target?: SquadTarget, limit = 12): Promise<CommunitySquad[]> {
   const submissions = await prisma.communitySubmission.findMany({
-    where: { target },
+    where: target ? { target } : undefined,
     orderBy: { createdAt: "desc" },
     take: limit,
     include: { members: true },
@@ -200,6 +210,7 @@ export async function getCommunitySquads(target: SquadTarget, limit = 12): Promi
       authorName: s.authorName,
       authorAvatarSeed: s.authorName,
       formationName: formation?.name ?? s.formationId,
+      target: s.target as SquadTarget,
       title: s.title,
       likes: s.likes,
       createdAt: s.createdAt.toISOString().slice(0, 10),
@@ -231,6 +242,7 @@ export async function getTopCommunitySquad(target: SquadTarget): Promise<Communi
     authorName: submission.authorName,
     authorAvatarSeed: submission.authorName,
     formationName: formation?.name ?? submission.formationId,
+    target: submission.target as SquadTarget,
     title: submission.title,
     likes: submission.likes,
     createdAt: submission.createdAt.toISOString().slice(0, 10),

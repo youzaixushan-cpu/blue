@@ -2,7 +2,7 @@ import "./page.scss";
 import type { Metadata } from "next";
 import { getPlayerRankings, getFormationRankings, getCommunitySquads } from "@/lib/db/community";
 import { getAllPlayers } from "@/lib/db/players";
-import { DEFAULT_SQUAD_TARGET, isSquadTarget } from "@/lib/squad-target";
+import { isSquadTarget } from "@/lib/squad-target";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { TargetLinkTabs } from "@/components/shared/target-link-tabs";
 import { PlayerRankingList } from "@/components/community/player-ranking-list";
@@ -23,7 +23,8 @@ interface CommunityPageProps {
 
 export default async function CommunityPage({ searchParams }: CommunityPageProps) {
   const { target: rawTarget } = await searchParams;
-  const target = isSquadTarget(rawTarget) ? rawTarget : DEFAULT_SQUAD_TARGET;
+  // クエリパラメータ未指定・不正な値の場合はデフォルトで「すべて」（target横断）を表示する
+  const target = isSquadTarget(rawTarget) ? rawTarget : undefined;
 
   const [playerRankings, formationRankings, communitySquads, players] = await Promise.all([
     getPlayerRankings(target),
@@ -39,7 +40,7 @@ export default async function CommunityPage({ searchParams }: CommunityPageProps
         eyebrow="Community"
         title="みんなの代表"
         description="全国のファンが選んだ「あなたの26人」を集計。人気選手・人気フォーメーションが分かります。"
-        action={<TargetLinkTabs active={target} basePath="/community" />}
+        action={<TargetLinkTabs active={target} basePath="/community" showAllOption />}
       />
 
       <section>
