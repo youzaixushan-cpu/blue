@@ -3,7 +3,6 @@ import Link from "next/link";
 import { PlayerAvatar } from "@/components/shared/player-avatar";
 import { Badge } from "@/components/ui/badge";
 import { LikeButton } from "@/components/community/like-button";
-import { squadTargetShortLabel } from "@/lib/squad-target";
 import type { CommunitySquad, Player } from "@/lib/types";
 
 function formatDate(iso: string) {
@@ -35,14 +34,9 @@ export function TrendingSquads({
                 <p className="trending-squads__date">{formatDate(squad.createdAt)}</p>
               </div>
             </div>
-            <div className="trending-squads__badges">
-              <Badge variant="secondary" className="trending-squads__target">
-                {squadTargetShortLabel(squad.target)}
-              </Badge>
-              <Badge variant="secondary" className="trending-squads__formation">
-                {squad.formationName}
-              </Badge>
-            </div>
+            <Badge variant="secondary" className="trending-squads__formation">
+              {squad.formationName}
+            </Badge>
           </div>
 
           <p className="trending-squads__title">{squad.title}</p>
