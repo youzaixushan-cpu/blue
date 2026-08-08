@@ -67,7 +67,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             display: "flex",
             position: "relative",
             width: "100%",
-            height: "320px",
+            height: "360px",
             borderRadius: "20px",
             background: "#15803d",
           }}
@@ -86,15 +86,15 @@ export default async function Image({ params }: { params: Promise<{ id: string }
                   left: `${slot.x}%`,
                   top: `${slot.y}%`,
                   marginLeft: "-60px",
-                  marginTop: "-20px",
+                  marginTop: "-15px",
                   width: "120px",
                 }}
               >
                 <div
                   style={{
                     display: "flex",
-                    width: "14px",
-                    height: "14px",
+                    width: "10px",
+                    height: "10px",
                     borderRadius: "9999px",
                     background: "#ffffff",
                   }}
@@ -102,8 +102,8 @@ export default async function Image({ params }: { params: Promise<{ id: string }
                 <div
                   style={{
                     display: "flex",
-                    marginTop: "4px",
-                    fontSize: 16,
+                    marginTop: "3px",
+                    fontSize: 14,
                     fontWeight: 700,
                     color: "#ffffff",
                     textAlign: "center",
