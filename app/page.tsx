@@ -30,7 +30,10 @@ export default async function HomePage() {
         topRanking={topRanking}
       />
       <QuickLinks />
-      <StatsHighlight />
+      <StatsHighlight
+        recentResults={recentResults}
+        officialSquadCount={players.filter((p) => p.officialSquad).length}
+      />
       <RecentResults recentResults={recentResults} players={playersById} />
     </div>
   );
