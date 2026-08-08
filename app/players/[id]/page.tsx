@@ -8,9 +8,11 @@ import { PlayerOverview } from "@/components/player-detail/player-overview";
 
 export const dynamicParams = false;
 
+// officialSquadに限定すると、みんなの代表やAI予想が参照する候補選手
+// （officialSquad: false）の詳細ページが404になってしまうため、DBの全選手を対象にする。
 export async function generateStaticParams() {
   const players = await getAllPlayers();
-  return players.filter((p) => p.officialSquad).map((p) => ({ id: p.id }));
+  return players.map((p) => ({ id: p.id }));
 }
 
 export async function generateMetadata({

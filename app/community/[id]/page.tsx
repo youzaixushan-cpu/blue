@@ -10,6 +10,8 @@ import { PlayerAvatar } from "@/components/shared/player-avatar";
 import { Badge } from "@/components/ui/badge";
 import { SquadDetailPitch } from "@/components/community/squad-detail-pitch";
 import { LikeButton } from "@/components/community/like-button";
+import { ShareButtons } from "@/components/community/share-buttons";
+import { SquadDetailCta } from "@/components/community/squad-detail-cta";
 
 // 投稿ごとにいいね数などが変わるため、ビルド時に静的化せず常に最新のDB内容を表示する
 export const dynamic = "force-dynamic";
@@ -22,9 +24,19 @@ export async function generateMetadata({
   const { id } = await params;
   const detail = await getCommunitySquadDetail(id);
   if (!detail) return {};
+  const description = `${detail.authorName}さんが投稿した${detail.formationName}の予想布陣。`;
   return {
     title: detail.title,
-    description: `${detail.authorName}さんが投稿した${detail.formationName}の予想布陣。`,
+    description,
+    openGraph: {
+      type: "article",
+      url: `/community/${id}`,
+      title: detail.title,
+      description,
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
   };
 }
 
@@ -39,6 +51,9 @@ export default async function CommunitySquadDetailPage({
 
   const formation = getFormationById(detail.formationId);
   if (!formation) notFound();
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const squadUrl = `${siteUrl}/community/${detail.id}`;
 
   return (
     <div className="squad-detail-page">
@@ -71,12 +86,17 @@ export default async function CommunitySquadDetailPage({
 
       <SquadDetailPitch formation={formation} members={detail.members} />
 
-      <LikeButton
-        submissionId={detail.id}
-        initialLikes={detail.likes}
-        className="squad-detail-page__like"
-        iconClassName="squad-detail-page__like-icon"
-      />
+      <div className="squad-detail-page__actions">
+        <LikeButton
+          submissionId={detail.id}
+          initialLikes={detail.likes}
+          className="squad-detail-page__like"
+          iconClassName="squad-detail-page__like-icon"
+        />
+        <ShareButtons title={detail.title} formationName={detail.formationName} url={squadUrl} />
+      </div>
+
+      <SquadDetailCta target={detail.target} />
     </div>
   );
 }
