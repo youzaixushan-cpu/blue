@@ -63,7 +63,7 @@ Netlifyのサイト設定 → Environment variables に以下のキーを設定�
 - `DATABASE_URL` — Neonの**pooled**接続文字列（ホスト名に`-pooler`を含むもの。`POSTGRES_URL_NON_POOLING`ではない。サーバーレス環境でのコネクション枯渇を避けるため）
 - `NEXT_PUBLIC_SITE_URL` — デプロイ後のNetlifyドメイン（例: `https://your-site.netlify.app`）
 - `IP_HASH_SALT`
-- `CRON_SECRET` — `netlify/functions/sync-wikidata.mts`が呼び出す`/api/admin/sync-wikidata`の認証に使用
+- `CRON_SECRET` — Scheduled Function自体はこの変数を使わない（`syncAllPlayers()`を直接importして実行するため）。手動実行用に残している`/api/admin/sync-wikidata`エンドポイントの認証にのみ使う
 - `SEED_SECRET`
 - `AUTH_SECRET`
 - `AUTH_TRUST_HOST` — `true`（コード側の`trustHost: true`と二重設定だが念のため）
@@ -83,5 +83,6 @@ Googleログインを使う場合、[Google Cloud Console](https://console.cloud
 
 `netlify/functions/sync-wikidata.mts`（毎週日曜3:00 UTCにWikidata同期を実行）は通常のScheduled Functionとして実装されていますが、Netlifyには以下の制約があります。
 
-- **実行時間の上限は30秒**。超えると途中で打ち切られる（対象選手数が増えるなどして超過するようであれば、Background Function化などの対応が必要）
+- **実行時間の上限は30秒**。超えると途中で打ち切られる。この関数は`lib/sync-wikidata.ts`の`syncAllPlayers()`を直接呼び出し、対象選手（現在39人）を4件ずつ並列処理することで実測11〜13秒程度に収めている。対象選手数が大きく増える場合は`CONCURRENCY`定数の調整や、それでも収まらなければBackground Function化を検討すること
 - **無料プラン(Free)のFunction呼び出しは月125,000回まで**。この関数自体は週1回の実行なので影響しないが、他のAPI Routes（`/api/community/submissions`等、アクセスのたびに実行されるもの）も同じ上限を共有する点に注意
+- **Scheduled Functionsはpublished deploy（Production branchとして公開されたデプロイ）でのみ自動実行される**。Deploy Previews/ブランチデプロイでは指定した時刻になっても自動では動かない。動作確認したい場合は、サイトダッシュボードの**Functions**タブから対象の関数（`sync-wikidata`）を開き、**Run now**ボタンで手動実行できる（`/api/admin/sync-wikidata`をCRON_SECRET付きで叩く方法と合わせて、動作確認の手段は2通りある）
