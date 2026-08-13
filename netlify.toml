@@ -1,3 +1,12 @@
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
 # 旧vercel.jsonのcron（毎週日曜3:00 UTC）を移植。実行内容はnetlify/functions/sync-wikidata.mts側。
 [functions."sync-wikidata"]
   schedule = "0 3 * * 0"
