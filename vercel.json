@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/admin/sync-wikidata",
-      "schedule": "0 3 * * 0"
-    }
-  ]
-}
