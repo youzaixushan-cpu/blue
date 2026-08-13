@@ -2,15 +2,19 @@
 // ここでは実行内容（本体APIの呼び出し）のみを持つ。
 // 旧vercel.jsonのcron設定（毎週日曜3:00 UTC）を移植したもの。
 async function handler() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  // NEXT_PUBLIC_SITE_URLの設定漏れでcronが静かに失敗しないよう、Netlifyが
+  // Functionsランタイムに自動注入する本番ドメイン（process.env.URL）にフォールバックする。
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.URL;
   const cronSecret = process.env.CRON_SECRET;
 
-  if (!siteUrl || !cronSecret) {
-    console.error("sync-wikidata: NEXT_PUBLIC_SITE_URL or CRON_SECRET is not set");
-    return new Response("Missing NEXT_PUBLIC_SITE_URL or CRON_SECRET", { status: 500 });
+  if (!base) {
+    throw new Error("sync-wikidata: NEXT_PUBLIC_SITE_URL and URL are both unset, cannot resolve target host");
+  }
+  if (!cronSecret) {
+    throw new Error("sync-wikidata: CRON_SECRET is not set");
   }
 
-  const res = await fetch(`${siteUrl}/api/admin/sync-wikidata`, {
+  const res = await fetch(`${base}/api/admin/sync-wikidata`, {
     headers: { Authorization: `Bearer ${cronSecret}` },
   });
 
