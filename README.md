@@ -61,6 +61,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 Netlifyのサイト設定 → Environment variables に以下のキーを設定してください（値はここには書きません）。
 
 - `DATABASE_URL` — Neonの**pooled**接続文字列（ホスト名に`-pooler`を含むもの。`POSTGRES_URL_NON_POOLING`ではない。サーバーレス環境でのコネクション枯渇を避けるため）
+- `DIRECT_DATABASE_URL` — Neonの**非pooled（direct）**接続文字列（ホスト名に`-pooler`が付かない方）。`prisma migrate deploy`はpooled connectionだとアドバイザリーロック取得がタイムアウトすることがあるため、ビルド時のマイグレーションだけこちらを使う
 - `NEXT_PUBLIC_SITE_URL` — デプロイ後のNetlifyドメイン（例: `https://your-site.netlify.app`）
 - `IP_HASH_SALT`
 - `CRON_SECRET` — Scheduled Function自体はこの変数を使わない（`syncAllPlayers()`を直接importして実行するため）。手動実行用に残している`/api/admin/sync-wikidata`エンドポイントの認証にのみ使う
@@ -78,6 +79,8 @@ Googleログインを使う場合、[Google Cloud Console](https://console.cloud
 ### データベース（Neon）について
 
 このプロジェクトはNeon（PostgreSQL）を使用しています。Netlify Functionsはサーバーレスで実行のたびにコネクションを新規に張る可能性があるため、**`DATABASE_URL`は必ずNeonのpooled connection（PgBouncer経由）の文字列を使ってください**。Neonダッシュボードの「Connection Details」で"Pooled connection"を選んだ接続文字列がこれにあたります。
+
+一方、ビルド時に実行される`prisma migrate deploy`はpooled connectionと相性が悪く（アドバイザリーロック取得がタイムアウトする）、`DIRECT_DATABASE_URL`に非pooledの接続文字列を別途設定する必要があります（Neonの同じ「Connection Details」で"Pooled connection"のチェックを**外した**方）。アプリの実行時クエリ（`lib/db/client.ts`）は引き続き`DATABASE_URL`（pooled）を使うので、この2つは混同しないよう注意してください。
 
 ### Scheduled Functionsの制約
 

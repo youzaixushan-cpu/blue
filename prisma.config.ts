@@ -10,6 +10,10 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // migrate/studio/seedはpooled connection（PgBouncerのtransaction pooling）だと
+    // アドバイザリーロック取得がタイムアウトすることがあるため、CLIコマンドだけは
+    // 非pooled（direct）接続を使う。DIRECT_DATABASE_URL未設定の環境（ローカル開発等、
+    // pooler自体が無い）ではDATABASE_URLにフォールバックする。
+    url: process.env["DIRECT_DATABASE_URL"] ?? process.env["DATABASE_URL"],
   },
 });
