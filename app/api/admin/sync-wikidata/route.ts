@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { syncAllPlayers } from "@/lib/sync-wikidata";
+import { secureCompare } from "@/lib/secure-compare";
 
-// Vercel Cron はこのパスへGETリクエストを送るため、GETで受ける
+// 手動実行用（CRON_SECRET認証つき）。定期実行は netlify/functions/sync-wikidata.mts が担う。
 export async function GET(request: Request) {
-  const authHeader = request.headers.get("authorization");
+  const authHeader = request.headers.get("authorization") ?? "";
   const expected = process.env.CRON_SECRET;
 
-  if (!expected || authHeader !== `Bearer ${expected}`) {
+  if (!expected || !secureCompare(authHeader, `Bearer ${expected}`)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
