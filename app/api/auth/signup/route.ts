@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db/client";
+import { issueEmailVerificationToken } from "@/lib/auth-tokens";
+import { sendVerificationEmail } from "@/lib/email";
 
 export async function POST(request: Request) {
   let body: { name?: unknown; email?: unknown; password?: unknown };
@@ -30,6 +32,17 @@ export async function POST(request: Request) {
   await prisma.user.create({
     data: { email, password: hashed, name: name || email.split("@")[0] },
   });
+
+  // メール確認は必須のログイン条件にはしていない（実害が限定的なため）ので、送信に
+  // 失敗してもサインアップ自体は成功させる。
+  try {
+    const token = await issueEmailVerificationToken(email);
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    const verifyUrl = `${baseUrl}/verify-email?email=${encodeURIComponent(email)}&token=${token}`;
+    await sendVerificationEmail(email, verifyUrl);
+  } catch (error) {
+    console.error("[signup] 確認メールの送信に失敗しました", error);
+  }
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }

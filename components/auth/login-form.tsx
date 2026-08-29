@@ -63,6 +63,10 @@ export function LoginForm() {
         </Button>
       </form>
 
+      <p className="auth-form__forgot">
+        <Link href="/forgot-password">パスワードをお忘れですか？</Link>
+      </p>
+
       <div className="auth-form__divider">または</div>
 
       <Button
