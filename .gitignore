@@ -26,6 +26,7 @@
 
 # 作業引き継ぎメモ（secretsを含むためコミットしない）
 HANDOFF.md
+HANDOFF-*.md
 
 # debug
 npm-debug.log*
