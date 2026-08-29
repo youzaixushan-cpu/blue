@@ -21,6 +21,19 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
+# ログイン(Credentials)・サインアップへの総当たり対策。NextAuthは通常の
+# ログインフロー中にsession/csrf/providers等も叩くため、正規利用を誤検知
+# しない程度の余裕を持たせている。
+[[redirects]]
+  from = "/api/auth/*"
+  to = "/api/auth/:splat"
+  status = 200
+  force = true
+  [redirects.rate_limit]
+    window_limit = 30
+    window_size = 60
+    aggregate_by = ["ip", "domain"]
+
 # 旧vercel.jsonのcron（毎週日曜3:00 UTC）を移植。実行内容はnetlify/functions/sync-wikidata.mts側。
 [functions."sync-wikidata"]
   schedule = "0 3 * * 0"
